@@ -64,9 +64,17 @@
 		}
 		
 		
-		function log(stream, data) {
+		function log(stream, message) {
+			if(!message) {	// Hack to remove empty messages
+				return;
+			}
+		
 			var section = $('section#output');
-			section.append('<div class="' + stream + '">' + data + '</div>');
+			
+			var alert_type = (stream == "stderr") ? "alert" : "secondary";
+			var html = '<div data-alert class="alert-box ' + alert_type + ' radius">' + message + '</div>';
+			
+			section.append(html);
 		}
 	</script>
 {% endblock %}
