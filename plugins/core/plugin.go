@@ -13,10 +13,7 @@ var host = flag.String("host", "localhost", "host for plugin server")
 var port = flag.String("port", "1234", "port for plugin server")
 var server = rpc.NewServer()
 
-// BUG(Tobscher) These arguments are passed from
-// the main process.
 type Args struct {
-	// A, B int
 	Environment []string
 	Options     []string
 }
