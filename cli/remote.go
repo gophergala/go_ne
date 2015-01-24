@@ -34,22 +34,25 @@ func NewRemoteRunner() (*Remote, error) {
 }
 
 func (r *Remote) Run(task core.Task) error {
-	session := createSession(r.Client)
+	session, err := r.Client.NewSession()
+	if err != nil {
+		panic("Failed to create session: " + err.Error())
+	}
 	defer session.Close()
+
+	var b bytes.Buffer
+	session.Stdout = &b
 
 	log.Printf("Running task: %v %v\n", task.Name(), strings.Join(task.Args(), " "))
 
 	cmd := fmt.Sprintf("%v %v", task.Name(), strings.Join(task.Args(), " "))
-	var stdOut bytes.Buffer
-	var stdErr bytes.Buffer
-	session.Stdout = &stdOut
-	session.Stderr = &stdErr
 
 	if err := session.Run(cmd); err != nil {
-		fmt.Println(stdErr.String())
+		log.Println(err)
 		return err
 	}
-	fmt.Println(stdOut.String())
+
+	fmt.Print(b.String())
 
 	return nil
 }
@@ -89,19 +92,6 @@ func createClient(username, password, host, port, key string) *ssh.Client {
 	}
 
 	return client
-}
-
-func createSession(client *ssh.Client) *ssh.Session {
-	session, err := client.NewSession()
-	if err != nil {
-		panic("Failed to create session: " + err.Error())
-	}
-
-	if err := session.Shell(); err != nil {
-		log.Fatalf("failed to start shell: %s", err)
-	}
-
-	return session
 }
 
 func loadKey(file string) (interface{}, error) {
