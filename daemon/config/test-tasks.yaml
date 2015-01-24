@@ -10,9 +10,17 @@ tasks:
       - command: "echo"
         args:
         - "deploying..."
+      - plugin: "env"
+      - command: "echo"
+        args:
+        - "- mid deploy -"
       - command: "echo"
         args:
         - "deployed!"
+      - plugin: "ping"
+        args:
+          - "-c 3"
+          - "http://www.golang.org"
   raiseerror:
     steps:
       - command: "echo"

@@ -8,16 +8,10 @@
 	</div>
 
 	<div class="row">
-		<div class="large-6 columns">
-			<h2>stdout</h2>
+		<div class="large-12 columns">
+			<h2>Output</h2>
 			
-			<section id="stdout">
-			</section>
-		</div>
-		<div class="large-6 columns">
-			<h2>stderr</h2>
-
-			<section id="stderr">
+			<section id="output">
 			</section>
 		</div>
 	</div>
@@ -71,7 +65,7 @@
 		
 		
 		function log(stream, data) {
-			var section = $('section#' + stream);
+			var section = $('section#output');
 			section.append('<div class="' + stream + '">' + data + '</div>');
 		}
 	</script>

@@ -3,8 +3,10 @@ package main
 import (
 	"io"
 	"os/exec"
+//	"strings"
 
 	"github.com/gophergala/go_ne/core"
+//	"log"
 )
 
 
@@ -12,16 +14,25 @@ const READ_BUFFER_SIZE = 1024
 
 
 type Local struct {
+	chStdOut   chan []byte
+	chStdErr   chan []byte
 }
 
 
 func NewLocalRunner() (*Local, error) {
-	return &Local{}, nil
+	lr := Local{
+		chStdOut: make(chan []byte),
+		chStdErr: make(chan []byte),
+	}
+
+	return &lr, nil
 }
 
 
-func (l *Local) Run(task *core.Task, chStdOut chan<- []byte, chStdErr chan<- []byte) (error) {
-	cmd := exec.Command(task.Command, task.Args...)
+func (l *Local) Run(task core.Task) (error) {
+	//log.Printf("Running task: %v %v\n", task.Name(), strings.Join(task.Args(), " "))
+
+	cmd := exec.Command(task.Name(), task.Args()...)
 	stdOut, err := cmd.StdoutPipe(); if err != nil {
 		return err
 	}
@@ -48,8 +59,8 @@ func (l *Local) Run(task *core.Task, chStdOut chan<- []byte, chStdErr chan<- []b
 			return err
 		}
 
-		chStdOut <- bufferStdOut[:outBytes]
-		chStdErr <- bufferStdErr[:errBytes]
+		l.chStdOut <- bufferStdOut[:outBytes]
+		l.chStdErr <- bufferStdErr[:errBytes]
 
 		if(outBytes == 0 && errBytes == 0) {
 			break

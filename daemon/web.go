@@ -193,19 +193,16 @@ func (web *Web) sockGokissTaskRun(config *core.Config) func(ws *websocket.Conn) 
 
 
 func (web *Web) taskRun(w io.Writer, taskName string, config *core.Config) {
-	task, ok := config.Tasks[taskName]; if !ok {
+	runner, err := NewLocalRunner(); if err != nil {
 		io.WriteString(w, "Error!")
-		return
+		return	
 	}
-	
-	io.WriteString(w, fmt.Sprintf("Task %s has %d steps:\n", taskName, len(task.Steps)))
-	
-	stdOut := make(chan []byte)
-	stdErr := make(chan []byte)
+
+	// #TODO: Fix this - lots of zero-length messages flying around...
 	go func() {
 		for {
 			select {
-				case out := <-stdOut:
+				case out := <-runner.chStdOut:
 					if(len(out) == 0) {
 //						break;
 					}
@@ -221,7 +218,7 @@ func (web *Web) taskRun(w io.Writer, taskName string, config *core.Config) {
 						},
 					})
 
-				case out := <-stdErr:
+				case out := <-runner.chStdErr:
 					if(len(out) == 0) {
 //						break;
 					}
@@ -239,25 +236,21 @@ func (web *Web) taskRun(w io.Writer, taskName string, config *core.Config) {
 			}
 		}
 	}()
-
-	for _, step := range task.Steps {
-		task, _ := core.NewTask(step.Command, step.Args)
-		runner, _ := NewLocalRunner()
-
-		err := runner.Run(task, stdOut, stdErr); if err != nil {
-			outString := fmt.Sprintf("%s", err)
-			io.WriteString(w, outString)
-
-			// #TODO: Handle error...
-			web.sendResponseToSocket(w, WsResponse{
-				Type: "err",
-				Data: map[string]string{
-					"message": outString,
-				},
-			})
-		}
-	}
 	
+	err = core.RunTask(runner, config, taskName); if err != nil {
+		outString := fmt.Sprintf("%s", err)
+		io.WriteString(w, outString)
+
+		// #TODO: Handle error...
+		web.sendResponseToSocket(w, WsResponse{
+			Type: "err",
+			Data: map[string]string{
+				"message": outString,
+			},
+		})	
+	}
+	log.Printf("3")
+		
 	io.WriteString(w, "Complete!")
 }
 

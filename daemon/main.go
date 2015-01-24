@@ -1,19 +1,25 @@
 package main
 
 import (
-	"github.com/gophergala/go_ne/core"
 	"log"
+
+	"github.com/gophergala/go_ne/core"
 )
 
+// BUG(Tobscher) use command line arguments to perform correct task
 func main() {
-	config, err := core.NewConfig(); if err != nil {
+	log.SetPrefix("[go-ne] ")
+
+	config, err := core.NewConfig()
+	if err != nil {
 		log.Fatal(err)
 	}
 
-	err = config.Load("config/test-tasks.yaml"); if err != nil {
+	err = config.Load("config/test-tasks.yaml")
+	if err != nil {
 		log.Fatal(err)
 	}
-	
+
 	w, err := NewWeb(); if err != nil {
 		log.Fatal(err)
 	}
