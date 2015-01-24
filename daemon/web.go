@@ -41,7 +41,8 @@ func (web* Web) Serve(port uint, config *core.Config) (error) {
 
 	// Serve web...
 	mux.Get(WEB_FOLDER + "/", web.wwwGokiss())
-	mux.Get(WEB_FOLDER + "/tasks", web.wwwGokissTasks(config))
+	mux.Get(WEB_FOLDER + "/task", web.wwwGokissTasks(config))
+	mux.Get(WEB_FOLDER + "/task/:taskName/run", web.wwwGokissTaskRun(config))
 	mux.Get(WEB_FOLDER + "/auth/log-in", web.wwwGokissAuthLogin())
 
 	http.Handle("/", mux)
@@ -79,6 +80,7 @@ func (web* Web) wwwGokissTasks(config *core.Config) func(w http.ResponseWriter, 
 		out, err := tpl.Execute(pongo2.Context{
 			"webfolder": WEB_FOLDER,
 			"title": "Tasks",
+			"tasks": config.Tasks,
 		}); if err != nil {
 			web.errorHandler(w, http.StatusInternalServerError)
 			return
@@ -107,6 +109,34 @@ func (web* Web) wwwGokissAuthLogin() func(w http.ResponseWriter, r *http.Request
 		io.WriteString(w, out)		
 	}
 }
+
+
+
+func (web* Web) wwwGokissTaskRun(config *core.Config) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := r.URL.Query()
+		taskName := params.Get(":taskName")
+
+		task, ok := config.Tasks[taskName]; if !ok {
+			web.errorHandler(w, http.StatusNotFound)
+			return
+		}
+		
+		out := fmt.Sprintf("Task %s has %d steps", taskName, len(task.Steps))
+
+		for _, step := range task.Steps {
+			task, _ := core.NewTask(step.Command, step.Args)
+			runner, _ := NewLocalRunner()
+
+			runner.Run(task)
+		}	
+		
+		out = out + fmt.Sprint("...Complete")
+
+		io.WriteString(w, out)		
+	}
+}
+
 
 
 

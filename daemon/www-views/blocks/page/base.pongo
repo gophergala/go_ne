@@ -23,7 +23,7 @@
 					{# Left Nav Section #}
 					<ul class="left">
 						<li>
-							<a href="{{ webfolder }}/tasks">Tasks</a>
+							<a href="{{ webfolder }}/task">Tasks</a>
 						</li>
 					</ul>
 

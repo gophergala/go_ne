@@ -19,20 +19,4 @@ func main() {
 	}
 
 	w.Serve(20000, config)
-
-/*	
-	for _, step := range config.Tasks[`sayhello`].Steps {
-		task, _ := core.NewTask(step.Command, step.Args)
-		runner, _ := NewLocalRunner()
-
-		runner.Run(task)
-	}	
-
-	for _, step := range config.Tasks[`deploy`].Steps {
-		task, _ := core.NewTask(step.Command, step.Args)
-		runner, _ := NewLocalRunner()
-
-		runner.Run(task)
-	}
-*/
 }
