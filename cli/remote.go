@@ -54,7 +54,7 @@ func (r *Remote) Run(task core.Task) error {
 	}
 	defer session.Close()
 
-	fmt.Println(ansi.Color(fmt.Sprintf("executing `%v %v`", task.Name(), strings.Join(task.Args(), " ")), "green"))
+	fmt.Println(ansi.Color(fmt.Sprintf("Executing `%v %v`", task.Name(), strings.Join(task.Args(), " ")), "green"))
 
 	cmd := fmt.Sprintf("%v %v", task.Name(), strings.Join(task.Args(), " "))
 
