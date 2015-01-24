@@ -4,10 +4,10 @@
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 		<title>GoKiss {% if title %}| {{ title }}{% endif %}</title>
-		<link rel="stylesheet" href="/static/packages/foundation/5.5.0/css/foundation.css" />
-		<link rel="stylesheet" href="/static/style/default.css" />
-		<script src="/static/packages/foundation/5.5.0/js/vendor/modernizr.js"></script>
-		<link rel="stylesheet" href="/static/packages/foundation-icon-fonts-3/foundation-icons.css" type='text/css' />
+		<link rel="stylesheet" href="{{ webfolder }}/static/packages/foundation/5.5.0/css/foundation.css" />
+		<link rel="stylesheet" href="{{ webfolder }}/static/style/default.css" />
+		<script src="{{ webfolder }}/static/packages/foundation/5.5.0/js/vendor/modernizr.js"></script>
+		<link rel="stylesheet" href="{{ webfolder }}/static/packages/foundation-icon-fonts-3/foundation-icons.css" type='text/css' />
 	</head>
 	<body>
 		<div class="fixed">
@@ -44,9 +44,9 @@
 			</div>
 		</footer>
 
-		<script src="/static/packages/foundation/5.5.0/js/vendor/jquery.js"></script>
-		<script src="/static/packages/foundation/5.5.0/js/foundation.min.js"></script>
-		<script src="/static/packages/foundation/5.5.0/js/foundation/foundation.topbar.js"></script>
+		<script src="{{ webfolder }}/static/packages/foundation/5.5.0/js/vendor/jquery.js"></script>
+		<script src="{{ webfolder }}/static/packages/foundation/5.5.0/js/foundation.min.js"></script>
+		<script src="{{ webfolder }}/static/packages/foundation/5.5.0/js/foundation/foundation.topbar.js"></script>
 		
 		<script>
 			$(document).foundation();

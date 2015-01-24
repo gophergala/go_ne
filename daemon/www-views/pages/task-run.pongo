@@ -1,0 +1,78 @@
+{% extends "blocks/page/base.pongo" %}
+
+{% block main %}
+	<div class="row">
+		<div class="large-12 columns">
+			<h1>Running Task: {{ taskName }}</h1>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="large-6 columns">
+			<h2>stdout</h2>
+			
+			<section id="stdout">
+			</section>
+		</div>
+		<div class="large-6 columns">
+			<h2>stderr</h2>
+
+			<section id="stderr">
+			</section>
+		</div>
+	</div>
+{% endblock %}
+
+
+{% block script %}
+	<script type="text/javascript" src="{{ webfolder }}/static/packages/jquery/1.11.2/jquery-1.11.2.min.js"></script>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			startWebsocket();
+		});
+		
+		
+		function startWebsocket() {
+			if(!window["WebSocket"]) {
+				alert("Your browser does not support WebSockets.");
+			} else {
+				var ws = new WebSocket("ws://{{ host }}{{ webfolder }}/socket");
+				
+				ws.onopen = function(evt) {
+					// alert("open");
+					ws.send(JSON.stringify({
+						"action": "task-run",
+						"args": {
+							"taskName": "{{ taskName }}"
+						}
+					}));
+				}
+
+				ws.onclose = function(evt) {
+					// alert("close");
+				}
+							
+				ws.onmessage = function(evt) {
+					console.log(evt);
+
+					msg = JSON.parse(evt.data);
+					
+					console.log(msg.type);
+					
+					log('std' + msg.type, msg.data.message);
+				}
+
+				ws.onerror = function(evt) {
+					// alert("error");
+				}
+			}
+		}
+		
+		
+		function log(stream, data) {
+			var section = $('section#' + stream);
+			section.append('<div class="' + stream + '">' + data + '</div>');
+		}
+	</script>
+{% endblock %}

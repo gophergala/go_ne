@@ -13,3 +13,11 @@ tasks:
       - command: "echo"
         args:
         - "deployed!"
+  raiseerror:
+    steps:
+      - command: "echo"
+        args:
+        - "raise error"
+      - command: "test"
+        args:
+        - "this should break"
