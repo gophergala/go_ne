@@ -1,11 +1,11 @@
 package main
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 
 	"golang.org/x/crypto/ssh"
@@ -41,19 +41,18 @@ func (r *Remote) Run(task core.Task) error {
 	}
 	defer session.Close()
 
-	var b bytes.Buffer
-	session.Stdout = &b
-
 	fmt.Println(ansi.Color(fmt.Sprintf("executing `%v %v`", task.Name(), strings.Join(task.Args(), " ")), "green"))
 
 	cmd := fmt.Sprintf("%v %v", task.Name(), strings.Join(task.Args(), " "))
 
-	if err := session.Run(cmd); err != nil {
+	session.Stdout = os.Stdout
+	session.Stderr = os.Stderr
+	if err := session.Start(cmd); err != nil {
 		log.Println(err)
 		return err
 	}
 
-	fmt.Print(b.String())
+	session.Wait()
 
 	return nil
 }
