@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/gophergala/go_ne/plugins/shared"
+	"github.com/mgutz/ansi"
 )
 
 var pluginPrefix = "plugin"
@@ -38,7 +39,7 @@ func StartPlugin(name string) *Plugin {
 	host := "localhost"
 	port := nextAvailblePort()
 
-	log.Printf("Starting plugin `%v` on port %v\n", name, port)
+	fmt.Println(ansi.Color(fmt.Sprintf("-- Starting plugin `%v` on port %v", name, port), "black+h"))
 
 	cmd := exec.Command(command,
 		fmt.Sprintf("-host=%v", host),
@@ -59,11 +60,11 @@ func StartPlugin(name string) *Plugin {
 
 	var conn net.Conn
 	for i := 1; i <= 5; i++ {
-		log.Printf("Attempt %v to connect to plugin...", i)
+		fmt.Print(ansi.Color(fmt.Sprintf("-- Attempt %v to connect to plugin...", i), "black+h"))
 
 		conn, err = net.Dial("tcp", info.Address())
 		if err != nil {
-			log.Print("FAILED")
+			fmt.Println(ansi.Color("FAILED", "black+h"))
 			time.Sleep(100 * time.Millisecond)
 			continue
 
@@ -72,7 +73,7 @@ func StartPlugin(name string) *Plugin {
 			}
 		}
 
-		log.Print("OK")
+		fmt.Println(ansi.Color("OK", "black+h"))
 
 		break
 	}
@@ -121,7 +122,7 @@ func nextAvailblePort() string {
 // BUG(Tobscher) Send signal to gracefully shutdown the plugin
 func StopAllPlugins() {
 	for k, v := range loadedPlugins {
-		log.Printf("Stopping plugin: %v\n", k)
+		fmt.Println(ansi.Color(fmt.Sprintf("-- Stopping plugin: %v", k), "black+h"))
 		v.information.Cmd.Process.Kill()
 	}
 }

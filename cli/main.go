@@ -7,8 +7,6 @@ import (
 )
 
 func main() {
-	log.SetPrefix("[go-ne] ")
-
 	config, err := core.NewConfig()
 	if err != nil {
 		log.Fatal(err)

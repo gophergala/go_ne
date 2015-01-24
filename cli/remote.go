@@ -11,6 +11,7 @@ import (
 	"golang.org/x/crypto/ssh"
 
 	"github.com/gophergala/go_ne/core"
+	"github.com/mgutz/ansi"
 )
 
 var username = flag.String("username", "", "username for remote server")
@@ -43,7 +44,7 @@ func (r *Remote) Run(task core.Task) error {
 	var b bytes.Buffer
 	session.Stdout = &b
 
-	log.Printf("Running task: %v %v\n", task.Name(), strings.Join(task.Args(), " "))
+	fmt.Println(ansi.Color(fmt.Sprintf("executing `%v %v`", task.Name(), strings.Join(task.Args(), " ")), "green"))
 
 	cmd := fmt.Sprintf("%v %v", task.Name(), strings.Join(task.Args(), " "))
 
@@ -85,7 +86,7 @@ func createClient(username, password, host, port, key string) *ssh.Client {
 
 	remoteServer := fmt.Sprintf("%v:%v", host, port)
 
-	log.Printf("Connecting to %v@%v\n", username, remoteServer)
+	fmt.Println(ansi.Color(fmt.Sprintf("Connecting to %v@%v", username, remoteServer), "blue"))
 	client, err := ssh.Dial("tcp", remoteServer, config)
 	if err != nil {
 		panic("Failed to dial: " + err.Error())
