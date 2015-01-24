@@ -1,9 +1,12 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/gophergala/go_ne/core"
+	"github.com/mgutz/ansi"
 )
 
 func main() {
@@ -17,6 +20,20 @@ func main() {
 		log.Fatal(err)
 	}
 
-	runner, _ := NewRemoteRunner()
-	core.RunAll(runner, config)
+	runner, err := NewRemoteRunner()
+	if err != nil {
+		fail(err)
+	}
+
+	err = core.RunAll(runner, config)
+	if err != nil {
+		fail(err)
+	} else {
+		fmt.Println(ansi.Color("Tasks completed successfully", "green"))
+	}
+}
+
+func fail(err error) {
+	fmt.Println(ansi.Color(fmt.Sprintf("Tasks failed: %v", err), "red"))
+	os.Exit(1)
 }

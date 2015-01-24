@@ -27,7 +27,10 @@ type Remote struct {
 func NewRemoteRunner() (*Remote, error) {
 	flag.Parse()
 
-	client := createClient(*username, *password, *host, *port, *key)
+	client, err := createClient(*username, *password, *host, *port, *key)
+	if err != nil {
+		return nil, err
+	}
 
 	return &Remote{
 		Client: client,
@@ -57,7 +60,7 @@ func (r *Remote) Run(task core.Task) error {
 	return nil
 }
 
-func createClient(username, password, host, port, key string) *ssh.Client {
+func createClient(username, password, host, port, key string) (*ssh.Client, error) {
 	authMethods := []ssh.AuthMethod{}
 
 	if len(password) > 0 {
@@ -85,13 +88,13 @@ func createClient(username, password, host, port, key string) *ssh.Client {
 
 	remoteServer := fmt.Sprintf("%v:%v", host, port)
 
-	fmt.Println(ansi.Color(fmt.Sprintf("Connecting to %v@%v", username, remoteServer), "blue"))
+	fmt.Println(ansi.Color(fmt.Sprintf("Connecting to %v@%v", username, remoteServer), "green"))
 	client, err := ssh.Dial("tcp", remoteServer, config)
 	if err != nil {
-		panic("Failed to dial: " + err.Error())
+		return nil, err
 	}
 
-	return client
+	return client, nil
 }
 
 func loadKey(file string) (interface{}, error) {
