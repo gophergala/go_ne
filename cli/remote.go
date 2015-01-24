@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -14,16 +15,24 @@ import (
 	"github.com/mgutz/ansi"
 )
 
-var username = flag.String("username", "", "username for remote server")
-var password = flag.String("password", "", "password for remote server")
-var key = flag.String("key", "", "path to private key")
-var host = flag.String("host", "", "host for remote server")
-var port = flag.String("port", "22", "ssh port")
+var (
+	username = flag.String("username", "root", "username for remote server")
+	password = flag.String("password", "", "password for remote server")
+	key      = flag.String("key", "", "path to private key")
+	host     = flag.String("host", "", "host for remote server")
+	port     = flag.String("port", "22", "ssh port")
+)
 
+// Remote describes a runner which runs task
+// on a remote system via SSH.
 type Remote struct {
 	Client *ssh.Client
 }
 
+// NewRemoteRunner creates a new runner which runs
+// tasks on a remote system.
+//
+// An SSH connection will be establishe.
 func NewRemoteRunner() (*Remote, error) {
 	flag.Parse()
 
@@ -37,10 +46,11 @@ func NewRemoteRunner() (*Remote, error) {
 	}, nil
 }
 
+// Run runs the given task on the remote system
 func (r *Remote) Run(task core.Task) error {
 	session, err := r.Client.NewSession()
 	if err != nil {
-		panic("Failed to create session: " + err.Error())
+		return errors.New("Failed to create session: " + err.Error())
 	}
 	defer session.Close()
 
@@ -51,13 +61,17 @@ func (r *Remote) Run(task core.Task) error {
 	session.Stdout = os.Stdout
 	session.Stderr = os.Stderr
 	if err := session.Start(cmd); err != nil {
-		log.Println(err)
 		return err
 	}
 
 	session.Wait()
 
 	return nil
+}
+
+// Close closes the SSH connection to the remote system
+func (r *Remote) Close() {
+	r.Client.Close()
 }
 
 func createClient(username, password, host, port, key string) (*ssh.Client, error) {
@@ -109,8 +123,4 @@ func loadKey(file string) (interface{}, error) {
 	}
 
 	return key, nil
-}
-
-func (r *Remote) Close() {
-	r.Client.Close()
 }
