@@ -3,7 +3,8 @@ package core
 import (
 	"os"
 
-	"github.com/gophergala/go_ne/plugins/core"
+	"github.com/gophergala/go_ne/plugins/shared"
+
 	"errors"
 )
 
@@ -12,13 +13,15 @@ type Task interface {
 	Args() []string
 }
 
-func RunAll(runner Runner, config *Config) (error) {
+func RunAll(runner Runner, config *Config) error {
 	defer StopAllPlugins()
+	defer runner.Close()
 
 	for _, t := range config.Tasks {
 		for _, s := range t.Steps {
-			err := RunStep(runner, &s); if err != nil {
-				return err;
+			err := RunStep(runner, &s)
+			if err != nil {
+				return err
 			}
 		}
 	}
@@ -26,16 +29,18 @@ func RunAll(runner Runner, config *Config) (error) {
 	return nil
 }
 
-
-func RunTask(runner Runner, config *Config, taskName string) (error) {
+func RunTask(runner Runner, config *Config, taskName string) error {
 	defer StopAllPlugins()
+	defer runner.Close()
 
-	task, ok := config.Tasks[taskName]; if !ok {
+	task, ok := config.Tasks[taskName]
+	if !ok {
 		return errors.New("No task exists with that name")
 	}
-	
+
 	for _, s := range task.Steps {
-		err := RunStep(runner, &s); if err != nil {
+		err := RunStep(runner, &s)
+		if err != nil {
 			return err
 		}
 	}
@@ -43,35 +48,38 @@ func RunTask(runner Runner, config *Config, taskName string) (error) {
 	return nil
 }
 
-
-func RunStep(runner Runner, s *ConfigStep) (error) {
+func RunStep(runner Runner, s *ConfigStep) error {
 	var command *Command
 	var err error
-	
+
 	if s.Plugin != nil {
 		// Load plugin
-		p, err := GetPlugin(*s.Plugin); if err != nil {
+		p, err := GetPlugin(*s.Plugin)
+		if err != nil {
 			return err
 		}
 
-		pluginArgs := plugin.Args{
+		pluginArgs := shared.Args{
 			Environment: os.Environ(),
 			Options:     s.Args,
 		}
 
-		command, err = p.GetCommand(pluginArgs); if err != nil {
+		command, err = p.GetCommand(pluginArgs)
+		if err != nil {
 			return err
 		}
 	} else {
 		// Run arbitrary command
-		command, err = NewCommand(*s.Command, s.Args); if err != nil {
+		command, err = NewCommand(*s.Command, s.Args)
+		if err != nil {
 			return err
 		}
 	}
 
-	err = runner.Run(command); if err != nil {
+	err = runner.Run(command)
+	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }

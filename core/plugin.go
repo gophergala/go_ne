@@ -2,7 +2,6 @@ package core
 
 import (
 	"fmt"
-	"log"
 	"net"
 	"net/rpc"
 	"net/rpc/jsonrpc"
@@ -11,7 +10,8 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gophergala/go_ne/plugins/core"
+	"github.com/gophergala/go_ne/plugins/shared"
+	"github.com/mgutz/ansi"
 )
 
 var pluginPrefix = "plugin"
@@ -38,7 +38,7 @@ func StartPlugin(name string) (*Plugin, error) {
 	host := "localhost"
 	port := nextAvailblePort()
 
-	log.Printf("Starting plugin `%v` on port %v\n", name, port)
+	fmt.Println(ansi.Color(fmt.Sprintf("-- Starting plugin `%v` on port %v", name, port), "black+h"))
 
 	cmd := exec.Command(command,
 		fmt.Sprintf("-host=%v", host),
@@ -46,7 +46,8 @@ func StartPlugin(name string) (*Plugin, error) {
 	)
 	cmd.Stdout = os.Stdout
 
-	err := cmd.Start(); if err != nil {
+	err := cmd.Start()
+	if err != nil {
 		return nil, err
 	}
 
@@ -58,11 +59,11 @@ func StartPlugin(name string) (*Plugin, error) {
 
 	var conn net.Conn
 	for i := 1; i <= 5; i++ {
-		log.Printf("Attempt %v to connect to plugin...", i)
+		fmt.Print(ansi.Color(fmt.Sprintf("-- Attempt %v to connect to plugin...", i), "black+h"))
 
 		conn, err = net.Dial("tcp", info.Address())
 		if err != nil {
-			log.Print("FAILED")
+			fmt.Println(ansi.Color("FAILED", "black+h"))
 			time.Sleep(100 * time.Millisecond)
 			continue
 
@@ -71,7 +72,7 @@ func StartPlugin(name string) (*Plugin, error) {
 			}
 		}
 
-		log.Print("OK")
+		fmt.Println(ansi.Color("OK", "black+h"))
 
 		break
 	}
@@ -92,18 +93,20 @@ func GetPlugin(name string) (*Plugin, error) {
 	var val *Plugin
 	var ok bool
 	var err error
-	
-	val, ok = loadedPlugins[name]; if !ok {
-		val, err = StartPlugin(name); if err != nil {
+
+	val, ok = loadedPlugins[name]
+	if !ok {
+		val, err = StartPlugin(name)
+		if err != nil {
 			return nil, err
 		}
 	}
 	return val, nil
 }
 
-func (p *Plugin) GetCommand(args plugin.Args) (*Command, error) {
+func (p *Plugin) GetCommand(args shared.Args) (*Command, error) {
 	// Pass in environment
-	var reply plugin.Response
+	var reply shared.Response
 	err := p.client.Call("Command.Execute", args, &reply)
 	if err != nil {
 		return nil, err
@@ -123,7 +126,7 @@ func nextAvailblePort() string {
 // BUG(Tobscher) Send signal to gracefully shutdown the plugin
 func StopAllPlugins() {
 	for k, v := range loadedPlugins {
-		log.Printf("Stopping plugin: %v\n", k)
+		fmt.Println(ansi.Color(fmt.Sprintf("-- Stopping plugin: %v", k), "black+h"))
 		v.information.Cmd.Process.Kill()
 	}
 }

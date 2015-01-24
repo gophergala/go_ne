@@ -7,34 +7,15 @@ import (
 	"net"
 	"net/rpc"
 	"net/rpc/jsonrpc"
+
+	"github.com/gophergala/go_ne/plugins/shared"
 )
 
 var host = flag.String("host", "localhost", "host for plugin server")
 var port = flag.String("port", "1234", "port for plugin server")
 var server = rpc.NewServer()
 
-type Args struct {
-	Environment []string
-	Options     []string
-}
-
-type Response struct {
-	Name string
-	Args []string
-}
-
-type Responder interface {
-	Execute(args Args, reply *Response) error
-}
-
-func NewResponse(name string, args []string) Response {
-	return Response{
-		Name: name,
-		Args: args,
-	}
-}
-
-func Register(r Responder) {
+func Register(r shared.Responder) {
 	server.Register(r)
 }
 

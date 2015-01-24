@@ -70,3 +70,7 @@ func (l *Local) Run(task core.Task) (error) {
 	cmd.Wait()
 	return nil
 }
+
+func (l *Local) Close() {
+
+}
