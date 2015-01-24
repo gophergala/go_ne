@@ -77,7 +77,7 @@ func NewPlugin(name string) (Task, error) {
 		client, err = rpc.DialHTTP("tcp", val.Address())
 		if err != nil {
 			log.Print("FAILED")
-			time.Sleep(10 * time.Millisecond)
+			time.Sleep(100 * time.Millisecond)
 			continue
 
 			if i == 5 {

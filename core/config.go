@@ -1,42 +1,40 @@
 package core
 
 import (
-	"gopkg.in/yaml.v2"
 	"io/ioutil"
-//	"log"
+
+	"gopkg.in/yaml.v2"
 )
 
-
 type ConfigStep struct {
-	Command   string
-	Args      []string
+	Plugin  *string
+	Command *string
+	Args    []string
 }
-
 
 type ConfigTask struct {
-	Steps   []ConfigStep
+	Steps []ConfigStep
 }
-
 
 type Config struct {
-	Tasks   map[string]ConfigTask
+	Tasks map[string]ConfigTask
 }
-
 
 func NewConfig() (*Config, error) {
 	c := Config{}
 	return &c, nil
 }
 
+func (c *Config) Load(filepath string) error {
+	rawYaml, err := ioutil.ReadFile(filepath)
+	if err != nil {
+		return err
+	}
 
-func (c* Config) Load(filepath string) (error) {
-	rawYaml, err := ioutil.ReadFile(filepath); if err != nil {
+	yaml.Unmarshal(rawYaml, &c)
+	if err != nil {
 		return err
 	}
-	
-	yaml.Unmarshal(rawYaml, &c); if err != nil {
-		return err
-	}
-	
+
 	return nil
 }

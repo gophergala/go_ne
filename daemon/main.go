@@ -19,14 +19,17 @@ func main() {
 	}
 
 	runner, _ := NewLocalRunner()
-	for _, step := range config.Tasks[`sayhello`].Steps {
-		task, _ := core.NewCommand(step.Command, step.Args)
-		runner.Run(task)
-	}
 
-	for _, step := range config.Tasks[`deploy`].Steps {
-		task, _ := core.NewCommand(step.Command, step.Args)
-		runner.Run(task)
+	var task core.Task
+	for _, t := range config.Tasks {
+		for _, s := range t.Steps {
+			if s.Plugin != nil {
+				task, _ = core.NewPlugin(*s.Plugin)
+			} else {
+				task, _ = core.NewCommand(*s.Command, s.Args)
+			}
+			runner.Run(task)
+		}
 	}
 
 	core.StopAllPlugins()

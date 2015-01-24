@@ -7,9 +7,11 @@ tasks:
         - "hello"
   deploy:
     steps:
+      - plugin: "env"
       - command: "echo"
         args:
         - "deploying..."
       - command: "echo"
         args:
         - "deployed!"
+      - plugin: "ping"
