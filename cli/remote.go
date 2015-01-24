@@ -50,8 +50,10 @@ func (r *Remote) Run(task core.Task) error {
 }
 
 func createSession(username, password, host, port, key string) *ssh.Session {
-	authMethods := []ssh.AuthMethod{
-		ssh.Password(password),
+	authMethods := []ssh.AuthMethod{}
+
+	if len(password) > 0 {
+		authMethods = append(authMethods, ssh.Password(password))
 	}
 
 	priv, err := loadKey(key)
