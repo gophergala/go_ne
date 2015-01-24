@@ -7,6 +7,8 @@ tasks:
         - "hello"
   deploy:
     steps:
+      - command: /usr/bin/whoami
+        args:
       - plugin: "env"
       - command: "echo"
         args:
@@ -17,4 +19,4 @@ tasks:
       - plugin: "ping"
         args:
           - "-c 3"
-          - "http://www.golang.org"
+          - "www.golang.org"

@@ -20,51 +20,58 @@ var host = flag.String("host", "", "host for remote server")
 var port = flag.String("port", "22", "ssh port")
 
 type Remote struct {
-	Session *ssh.Session
+	Client *ssh.Client
 }
 
 func NewRemoteRunner() (*Remote, error) {
 	flag.Parse()
 
+	client := createClient(*username, *password, *host, *port, *key)
+
 	return &Remote{
-		Session: createSession(*username, *password, *host, *port, *key),
+		Client: client,
 	}, nil
 }
 
 func (r *Remote) Run(task core.Task) error {
+	session := createSession(r.Client)
+	defer session.Close()
+
 	log.Printf("Running task: %v %v\n", task.Name(), strings.Join(task.Args(), " "))
 
 	cmd := fmt.Sprintf("%v %v", task.Name(), strings.Join(task.Args(), " "))
 	var stdOut bytes.Buffer
 	var stdErr bytes.Buffer
-	r.Session.Stdout = &stdOut
-	r.Session.Stderr = &stdErr
-	if err := r.Session.Run(cmd); err != nil {
+	session.Stdout = &stdOut
+	session.Stderr = &stdErr
+
+	if err := session.Run(cmd); err != nil {
 		fmt.Println(stdErr.String())
 		return err
-		// panic("Failed to run: " + err.Error())
 	}
-
 	fmt.Println(stdOut.String())
+
 	return nil
 }
 
-func createSession(username, password, host, port, key string) *ssh.Session {
+func createClient(username, password, host, port, key string) *ssh.Client {
 	authMethods := []ssh.AuthMethod{}
 
 	if len(password) > 0 {
 		authMethods = append(authMethods, ssh.Password(password))
 	}
 
-	priv, err := loadKey(key)
-	if err != nil {
-		log.Println(err)
-	} else {
-		signers, err := ssh.NewSignerFromKey(priv)
+	if len(key) > 0 {
+		priv, err := loadKey(key)
 		if err != nil {
 			log.Println(err)
 		} else {
-			authMethods = append(authMethods, ssh.PublicKeys(signers))
+			signers, err := ssh.NewSignerFromKey(priv)
+			if err != nil {
+				log.Println(err)
+			} else {
+				authMethods = append(authMethods, ssh.PublicKeys(signers))
+			}
 		}
 	}
 
@@ -81,9 +88,17 @@ func createSession(username, password, host, port, key string) *ssh.Session {
 		panic("Failed to dial: " + err.Error())
 	}
 
+	return client
+}
+
+func createSession(client *ssh.Client) *ssh.Session {
 	session, err := client.NewSession()
 	if err != nil {
 		panic("Failed to create session: " + err.Error())
+	}
+
+	if err := session.Shell(); err != nil {
+		log.Fatalf("failed to start shell: %s", err)
 	}
 
 	return session
@@ -104,5 +119,5 @@ func loadKey(file string) (interface{}, error) {
 }
 
 func (r *Remote) Close() {
-	r.Session.Close()
+	r.Client.Close()
 }
