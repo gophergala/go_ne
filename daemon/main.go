@@ -19,11 +19,18 @@ func main() {
 		tasks = append(tasks, task)
 	}
 
-	plugin, err := core.NewPlugin()
+	env, err := core.NewPlugin("env")
 	if err != nil {
 		log.Printf("Could not load plugin: %v\n", err)
 	} else {
-		tasks = append(tasks, plugin)
+		tasks = append(tasks, env)
+	}
+
+	ping, err := core.NewPlugin("ping")
+	if err != nil {
+		log.Printf("Could not load plugin: %v\n", err)
+	} else {
+		tasks = append(tasks, ping)
 	}
 
 	runner, _ := NewLocalRunner()
@@ -32,4 +39,6 @@ func main() {
 		log.Printf("Running task `%v` with arguments `%v`\n", v.Name(), strings.Join(v.Args(), " "))
 		runner.Run(v)
 	}
+
+	core.StopAllPlugins()
 }
