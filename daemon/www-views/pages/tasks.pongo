@@ -1,0 +1,9 @@
+{% extends "blocks/page/base.pongo" %}
+
+{% block main %}
+	<div class="row">
+		<div class="large-12 columns">
+			<h1>Tasks</h1>
+		</div>
+	</div>
+{% endblock %}

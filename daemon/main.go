@@ -14,6 +14,13 @@ func main() {
 		log.Fatal(err)
 	}
 	
+	w, err := NewWeb(); if err != nil {
+		log.Fatal(err)
+	}
+
+	w.Serve(20000, config)
+
+/*	
 	for _, step := range config.Tasks[`sayhello`].Steps {
 		task, _ := core.NewTask(step.Command, step.Args)
 		runner, _ := NewLocalRunner()
@@ -26,5 +33,6 @@ func main() {
 		runner, _ := NewLocalRunner()
 
 		runner.Run(task)
-	}	
+	}
+*/
 }

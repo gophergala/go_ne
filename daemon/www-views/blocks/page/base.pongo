@@ -1,0 +1,58 @@
+<!doctype html>
+<html class="no-js" lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>GoKiss {% if title %}| {{ title }}{% endif %}</title>
+		<link rel="stylesheet" href="/static/packages/foundation/5.5.0/css/foundation.css" />
+		<link rel="stylesheet" href="/static/style/default.css" />
+		<script src="/static/packages/foundation/5.5.0/js/vendor/modernizr.js"></script>
+		<link rel="stylesheet" href="/static/packages/foundation-icon-fonts-3/foundation-icons.css" type='text/css' />
+	</head>
+	<body>
+		<div class="fixed">
+			<nav class="top-bar" data-topbar role="navigation">
+				<ul class="title-area">
+					<li class="name">
+						<h1><a href="{{ webfolder }}/">GoKiss</a></h1>
+					</li>
+					<li class="toggle-topbar menu-icon"><a href="#"><span>Menu</span></a></li>
+				</ul>
+
+				<section class="top-bar-section">
+					{# Left Nav Section #}
+					<ul class="left">
+						<li>
+							<a href="{{ webfolder }}/tasks">Tasks</a>
+						</li>
+					</ul>
+
+					{# Right Nav Section #}
+					<ul class="right">
+						<li><a href="{{ webfolder }}/auth/log-in"><i class="fi-torso"></i> Log In</a></li>
+					</ul>
+				</section>
+			</nav>
+		</div>
+
+
+		{% block main %}{% endblock %}
+
+		<footer class="row">
+			<div class="large-12 columns">
+				<p>- <a href="{{ webfolder }}/">GoKiss</a> -</p>
+			</div>
+		</footer>
+
+		<script src="/static/packages/foundation/5.5.0/js/vendor/jquery.js"></script>
+		<script src="/static/packages/foundation/5.5.0/js/foundation.min.js"></script>
+		<script src="/static/packages/foundation/5.5.0/js/foundation/foundation.topbar.js"></script>
+		
+		<script>
+			$(document).foundation();
+		</script>
+		
+		{% block script %}
+		{% endblock %}
+	</body>
+</html>
