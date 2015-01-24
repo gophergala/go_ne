@@ -98,6 +98,10 @@ func createClient(username, password, host, port, key string) (*ssh.Client, erro
 		Auth: authMethods,
 	}
 
+	if len(host) == 0 {
+		return nil, errors.New("Please select the host you want to deploy to via `-host=name` flag")
+	}
+
 	remoteServer := fmt.Sprintf("%v:%v", host, port)
 
 	fmt.Println(ansi.Color(fmt.Sprintf("Connecting to %v@%v", username, remoteServer), "green"))
