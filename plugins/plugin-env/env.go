@@ -1,12 +1,15 @@
 package main
 
-import "github.com/gophergala/go_ne/plugins/core"
+import (
+	"github.com/gophergala/go_ne/plugins/core"
+	"github.com/gophergala/go_ne/plugins/shared"
+)
 
 type Command struct {
 }
 
-func (t *Command) Execute(args plugin.Args, reply *plugin.Response) error {
-	*reply = plugin.NewResponse("env", []string{})
+func (t *Command) Execute(args shared.Args, reply *shared.Response) error {
+	*reply = shared.NewResponse("env", []string{})
 
 	return nil
 }

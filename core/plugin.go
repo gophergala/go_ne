@@ -11,7 +11,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/gophergala/go_ne/plugins/core"
+	"github.com/gophergala/go_ne/plugins/shared"
 )
 
 var pluginPrefix = "plugin"
@@ -99,9 +99,9 @@ func GetPlugin(name string) (*Plugin, error) {
 	return val, nil
 }
 
-func (p *Plugin) GetCommand(args plugin.Args) (*Command, error) {
+func (p *Plugin) GetCommand(args shared.Args) (*Command, error) {
 	// Pass in environment
-	var reply plugin.Response
+	var reply shared.Response
 	err := p.client.Call("Command.Execute", args, &reply)
 	if err != nil {
 		return nil, err

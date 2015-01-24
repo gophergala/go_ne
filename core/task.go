@@ -4,7 +4,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/gophergala/go_ne/plugins/core"
+	"github.com/gophergala/go_ne/plugins/shared"
 )
 
 type Task interface {
@@ -26,7 +26,7 @@ func RunAll(runner Runner, config *Config) {
 					continue
 				}
 
-				pluginArgs := plugin.Args{
+				pluginArgs := shared.Args{
 					Environment: os.Environ(),
 					Options:     s.Args,
 				}
