@@ -1,0 +1,26 @@
+* {
+}
+
+body {
+	background-color: #ffffr8;
+}
+
+footer {
+	border-top: 1px dotted #c0c0c0;
+	text-align: center;
+	padding-top: 15px;
+	color: #808080;
+}
+
+div.stdout, div.stderr {
+	border: 1px solid #c0c0c0;
+	margin-bottom: 5px;
+}
+
+div.stdout {
+	background-color: #efffef;
+}
+
+div.stderr {
+	background-color: #ffefef;
+}

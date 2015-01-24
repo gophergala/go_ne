@@ -1,0 +1,26 @@
+{% extends "blocks/page/base.pongo" %}
+
+{% block main %}
+	<div class="row">
+		<div class="large-12 columns">
+			<h1>Tasks</h1>
+			
+			<table role="grid" class="fullWidth">
+				<thead>
+					<tr>
+						<th>Name</th>
+						<th><i class="fi-widget"></i></th>
+					</tr>
+				</thead>				
+				<tbody>
+					{% for taskName, task in tasks %}
+						<tr>
+							<td>{{ taskName }}</td>
+							<td><a href="{{ webfolder }}/task/{{ taskName }}/run">Run</a></td>
+						</tr>
+					{% endfor %}
+				</tbody>
+			</table>
+		</div>
+	</div>
+{% endblock %}

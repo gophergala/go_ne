@@ -33,7 +33,7 @@ func (p *PluginInformation) Address() string {
 	return fmt.Sprintf("%v:%v", p.Host, p.Port)
 }
 
-func StartPlugin(name string) *Plugin {
+func StartPlugin(name string) (*Plugin, error) {
 	command := fmt.Sprintf("%v-%v", pluginPrefix, name)
 	host := "localhost"
 	port := nextAvailblePort()
@@ -46,9 +46,8 @@ func StartPlugin(name string) *Plugin {
 	)
 	cmd.Stdout = os.Stdout
 
-	err := cmd.Start()
-	if err != nil {
-		log.Fatal(err)
+	err := cmd.Start(); if err != nil {
+		return nil, err
 	}
 
 	info := &PluginInformation{
@@ -68,7 +67,7 @@ func StartPlugin(name string) *Plugin {
 			continue
 
 			if i == 5 {
-				return nil
+				return nil, err
 			}
 		}
 
@@ -86,15 +85,18 @@ func StartPlugin(name string) *Plugin {
 
 	loadedPlugins[name] = plugin
 
-	return plugin
+	return plugin, nil
 }
 
 func GetPlugin(name string) (*Plugin, error) {
 	var val *Plugin
 	var ok bool
-
-	if val, ok = loadedPlugins[name]; !ok {
-		val = StartPlugin(name)
+	var err error
+	
+	val, ok = loadedPlugins[name]; if !ok {
+		val, err = StartPlugin(name); if err != nil {
+			return nil, err
+		}
 	}
 	return val, nil
 }

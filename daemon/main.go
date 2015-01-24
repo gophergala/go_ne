@@ -20,7 +20,9 @@ func main() {
 		log.Fatal(err)
 	}
 
-	runner, _ := NewLocalRunner()
+	w, err := NewWeb(); if err != nil {
+		log.Fatal(err)
+	}
 
-	core.RunAll(runner, config)
+	w.Serve(20000, config)
 }

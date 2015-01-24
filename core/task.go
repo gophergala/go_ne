@@ -1,10 +1,10 @@
 package core
 
 import (
-	"log"
 	"os"
 
 	"github.com/gophergala/go_ne/plugins/core"
+	"errors"
 )
 
 type Task interface {
@@ -12,42 +12,66 @@ type Task interface {
 	Args() []string
 }
 
-func RunAll(runner Runner, config *Config) {
-	var err error
-	var task Task
+func RunAll(runner Runner, config *Config) (error) {
+	defer StopAllPlugins()
 
 	for _, t := range config.Tasks {
 		for _, s := range t.Steps {
-			if s.Plugin != nil {
-				// Load plugin
-				p, err := GetPlugin(*s.Plugin)
-				if err != nil {
-					log.Println(err)
-					continue
-				}
-
-				pluginArgs := plugin.Args{
-					Environment: os.Environ(),
-					Options:     s.Args,
-				}
-
-				task, err = p.GetCommand(pluginArgs)
-				if err != nil {
-					log.Println(err)
-					continue
-				}
-			} else {
-				// Run arbitrary command
-				task, err = NewCommand(*s.Command, s.Args)
-				if err != nil {
-					log.Println(err)
-					continue
-				}
+			err := RunStep(runner, &s); if err != nil {
+				return err;
 			}
-
-			runner.Run(task)
 		}
 	}
 
-	StopAllPlugins()
+	return nil
+}
+
+
+func RunTask(runner Runner, config *Config, taskName string) (error) {
+	defer StopAllPlugins()
+
+	task, ok := config.Tasks[taskName]; if !ok {
+		return errors.New("No task exists with that name")
+	}
+	
+	for _, s := range task.Steps {
+		err := RunStep(runner, &s); if err != nil {
+			return err
+		}
+	}
+
+	return nil
+}
+
+
+func RunStep(runner Runner, s *ConfigStep) (error) {
+	var command *Command
+	var err error
+	
+	if s.Plugin != nil {
+		// Load plugin
+		p, err := GetPlugin(*s.Plugin); if err != nil {
+			return err
+		}
+
+		pluginArgs := plugin.Args{
+			Environment: os.Environ(),
+			Options:     s.Args,
+		}
+
+		command, err = p.GetCommand(pluginArgs); if err != nil {
+			return err
+		}
+	} else {
+		// Run arbitrary command
+		command, err = NewCommand(*s.Command, s.Args); if err != nil {
+			return err
+		}
+	}
+
+	err = runner.Run(command); if err != nil {
+		return err
+	}
+	
+	return nil
 }

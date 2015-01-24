@@ -7,10 +7,13 @@ tasks:
         - "hello"
   deploy:
     steps:
-      - plugin: "env"
       - command: "echo"
         args:
         - "deploying..."
+      - plugin: "env"
+      - command: "echo"
+        args:
+        - "- mid deploy -"
       - command: "echo"
         args:
         - "deployed!"
@@ -18,3 +21,11 @@ tasks:
         args:
           - "-c 3"
           - "http://www.golang.org"
+  raiseerror:
+    steps:
+      - command: "echo"
+        args:
+        - "raise error"
+      - command: "test"
+        args:
+        - "this should break"

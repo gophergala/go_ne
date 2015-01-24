@@ -1,0 +1,80 @@
+{% extends "blocks/page/base.pongo" %}
+
+{% block main %}
+	<div class="row">
+		<div class="large-12 columns">
+			<h1>Running Task: {{ taskName }}</h1>
+		</div>
+	</div>
+
+	<div class="row">
+		<div class="large-12 columns">
+			<h2>Output</h2>
+			
+			<section id="output">
+			</section>
+		</div>
+	</div>
+{% endblock %}
+
+
+{% block script %}
+	<script type="text/javascript" src="{{ webfolder }}/static/packages/jquery/1.11.2/jquery-1.11.2.min.js"></script>
+	
+	<script type="text/javascript">
+		$(document).ready(function() {
+			startWebsocket();
+		});
+		
+		
+		function startWebsocket() {
+			if(!window["WebSocket"]) {
+				alert("Your browser does not support WebSockets.");
+			} else {
+				var ws = new WebSocket("ws://{{ host }}{{ webfolder }}/socket");
+				
+				ws.onopen = function(evt) {
+					// alert("open");
+					ws.send(JSON.stringify({
+						"action": "task-run",
+						"args": {
+							"taskName": "{{ taskName }}"
+						}
+					}));
+				}
+
+				ws.onclose = function(evt) {
+					// alert("close");
+				}
+							
+				ws.onmessage = function(evt) {
+					console.log(evt);
+
+					msg = JSON.parse(evt.data);
+					
+					console.log(msg.type);
+					
+					log('std' + msg.type, msg.data.message);
+				}
+
+				ws.onerror = function(evt) {
+					// alert("error");
+				}
+			}
+		}
+		
+		
+		function log(stream, message) {
+			if(!message) {	// Hack to remove empty messages
+				return;
+			}
+		
+			var section = $('section#output');
+			
+			var alert_type = (stream == "stderr") ? "alert" : "secondary";
+			var html = '<div data-alert class="alert-box ' + alert_type + ' radius">' + message + '</div>';
+			
+			section.append(html);
+		}
+	</script>
+{% endblock %}
