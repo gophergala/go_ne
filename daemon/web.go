@@ -106,7 +106,7 @@ func (web* Web) wwwGokissAuthLogin() func(w http.ResponseWriter, r *http.Request
 			return
 		}
 		
-		io.WriteString(w, out)		
+		io.WriteString(w, out)
 	}
 }
 
@@ -122,18 +122,34 @@ func (web* Web) wwwGokissTaskRun(config *core.Config) func(w http.ResponseWriter
 			return
 		}
 		
-		out := fmt.Sprintf("Task %s has %d steps", taskName, len(task.Steps))
+		io.WriteString(w, fmt.Sprintf("Task %s has %d steps:\n", taskName, len(task.Steps)))
+		
+		stdOut := make(chan []byte)
+		go func() {
+			for {
+				select {
+					case out := <-stdOut:
+						if(len(out) == 0) {
+							break;
+						}
+					
+						outString := fmt.Sprintf("%s", out)
+						log.Print(outString)
+						io.WriteString(w, outString)
+				}
+			}
+		}()
 
 		for _, step := range task.Steps {
 			task, _ := core.NewTask(step.Command, step.Args)
 			runner, _ := NewLocalRunner()
 
-			runner.Run(task)
-		}	
+			err := runner.Run(task, stdOut); if err != nil {
+				log.Printf("%+v", err)
+			}
+		}
 		
-		out = out + fmt.Sprint("...Complete")
-
-		io.WriteString(w, out)		
+		io.WriteString(w, "Complete!")
 	}
 }
 
