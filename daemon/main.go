@@ -10,6 +10,8 @@ import (
 
 // BUG(Tobscher) use command line arguments to perform correct task
 func main() {
+	log.SetPrefix("[go-ne] ")
+
 	config, err := core.NewConfig()
 	if err != nil {
 		log.Fatal(err)
@@ -26,6 +28,7 @@ func main() {
 	for _, t := range config.Tasks {
 		for _, s := range t.Steps {
 			if s.Plugin != nil {
+				// Load plugin
 				p, err := core.GetPlugin(*s.Plugin)
 				if err != nil {
 					log.Println(err)
@@ -43,12 +46,14 @@ func main() {
 					continue
 				}
 			} else {
+				// Run arbitrary command
 				task, err = core.NewCommand(*s.Command, s.Args)
 				if err != nil {
 					log.Println(err)
 					continue
 				}
 			}
+
 			runner.Run(task)
 		}
 	}
