@@ -9,6 +9,8 @@ go_ne can be used in two different ways:
 * Remote execution of scripts via SSH
 * Execution of scripts via the web interface
 
+This project has been developed during [Gopher Gala 2015](http://gophergala.com/).
+
 ## Deploy via the web interface
 
 Describe how to deploy via the web interface...
@@ -104,6 +106,14 @@ func main() {
 ```
 
 The example above defines a plugin which runs the `env` command on your server.
+
+## Contributing
+
+1. Fork it ( https://github.com/gophergala/go_ne/fork )
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create a new Pull Request
 
 ## License
 
