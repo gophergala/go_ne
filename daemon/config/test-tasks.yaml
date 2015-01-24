@@ -1,0 +1,15 @@
+---
+tasks:
+  sayhello:
+    steps:
+      - command: "echo"
+        args:
+        - "hello"
+  deploy:
+    steps:
+      - command: "echo"
+        args:
+        - "deploying..."
+      - command: "echo"
+        args:
+        - "deployed!"
