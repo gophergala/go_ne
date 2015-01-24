@@ -9,6 +9,60 @@ go_ne can be used in two different ways:
 * Remote execution of scripts via SSH
 * Execution of scripts via the web interface
 
+## Deploy via the web interface
+
+Describe how to deploy via the web interface...
+
+## Deploy to a remote system
+
+You can start your deployment by running the following command:
+
+```
+$ cli -task=deploy
+```
+
+### Options
+
+#### -host
+
+```
+$ cli -host=www.example.org -task=deploy
+```
+
+Defines the remote host to connect to via SSH.
+
+#### -port
+
+```
+$ cli -port=23
+```
+
+Defines the port which is used to connect via SSH. Default: 22
+
+#### -username
+
+```
+$ cli -username=deployer -task=deploy
+```
+
+Defines the username to use to connect via SSH.
+
+#### -password
+
+```
+$ cli -password=secret
+```
+
+Defines the password to be used to connect via SSH.
+
+#### -key
+
+```
+$ cli -key=$HOME/.ssh/id_rsa
+```
+
+Defines the key file to be used to connect via SSH.
+
 ## Plugins
 
 ### How it works
