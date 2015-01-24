@@ -16,6 +16,8 @@ go_ne can be used in two different ways:
 We make use of a communication concept called [RPC](http://en.wikipedia.org/wiki/Remote_procedure_call). RPC allows
 us to communicate with plugins in an elegant way.
 
+NOTE: Your plugin has to start with the prefix `plugin-` in order to be revealed by the plugin framework.
+
 ### Write your own plugin
 
 You can easily write your own plugin by using our plugin framework. Here is an example:
