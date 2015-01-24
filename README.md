@@ -9,6 +9,8 @@ go_ne can be used in two different ways:
 * Remote execution of scripts via SSH
 * Execution of scripts via the web interface
 
+This project has been developed during [Gopher Gala 2015](http://gophergala.com/).
+
 ## Deploy via the web interface
 
 Describe how to deploy via the web interface...
