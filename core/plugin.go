@@ -1,10 +1,12 @@
 package core
 
 import (
-	"bytes"
 	"fmt"
 	"log"
+	"net"
 	"net/rpc"
+	"net/rpc/jsonrpc"
+	"os"
 	"os/exec"
 	"strconv"
 	"time"
@@ -13,11 +15,12 @@ import (
 )
 
 var pluginPrefix = "plugin"
-var loadedPlugins = make(map[string]*PluginInformation)
+var loadedPlugins = make(map[string]*Plugin)
 var startPort = 8000
 
 type Plugin struct {
-	Command
+	information *PluginInformation
+	client      *rpc.Client
 }
 
 type PluginInformation struct {
@@ -30,7 +33,7 @@ func (p *PluginInformation) Address() string {
 	return fmt.Sprintf("%v:%v", p.Host, p.Port)
 }
 
-func StartPlugin(name string) *PluginInformation {
+func StartPlugin(name string) *Plugin {
 	command := fmt.Sprintf("%v-%v", pluginPrefix, name)
 	host := "localhost"
 	port := nextAvailblePort()
@@ -41,10 +44,8 @@ func StartPlugin(name string) *PluginInformation {
 		fmt.Sprintf("-host=%v", host),
 		fmt.Sprintf("-port=%v", port),
 	)
-	var out bytes.Buffer
-	var errOut bytes.Buffer
-	cmd.Stdout = &out
-	cmd.Stderr = &errOut
+	cmd.Stdout = os.Stdout
+
 	err := cmd.Start()
 	if err != nil {
 		log.Fatal(err)
@@ -56,32 +57,18 @@ func StartPlugin(name string) *PluginInformation {
 		Cmd:  cmd,
 	}
 
-	loadedPlugins[name] = info
-
-	return info
-}
-
-func NewPlugin(name string) (Task, error) {
-	var val *PluginInformation
-	var ok bool
-	var client *rpc.Client
-	var err error
-
-	if val, ok = loadedPlugins[name]; !ok {
-		val = StartPlugin(name)
-	}
-
+	var conn net.Conn
 	for i := 1; i <= 5; i++ {
 		log.Printf("Attempt %v to connect to plugin...", i)
 
-		client, err = rpc.DialHTTP("tcp", val.Address())
+		conn, err = net.Dial("tcp", info.Address())
 		if err != nil {
 			log.Print("FAILED")
 			time.Sleep(100 * time.Millisecond)
 			continue
 
 			if i == 5 {
-				return nil, err
+				return nil
 			}
 		}
 
@@ -90,22 +77,40 @@ func NewPlugin(name string) (Task, error) {
 		break
 	}
 
+	client := jsonrpc.NewClient(conn)
+
+	plugin := &Plugin{
+		information: info,
+		client:      client,
+	}
+
+	loadedPlugins[name] = plugin
+
+	return plugin
+}
+
+func GetPlugin(name string) (*Plugin, error) {
+	var val *Plugin
+	var ok bool
+
+	if val, ok = loadedPlugins[name]; !ok {
+		val = StartPlugin(name)
+	}
+	return val, nil
+}
+
+func (p *Plugin) GetCommand(args plugin.Args) (*Command, error) {
 	// Pass in environment
-	args := &plugin.Args{7, 8}
 	var reply plugin.Response
-	err = client.Call("Command.Execute", args, &reply)
+	err := p.client.Call("Command.Execute", args, &reply)
 	if err != nil {
 		return nil, err
 	}
 
-	plugin := Plugin{
-		Command: Command{
-			name: reply.Name,
-			args: reply.Args,
-		},
-	}
-
-	return &plugin, nil
+	return &Command{
+		name: reply.Name,
+		args: reply.Args,
+	}, nil
 }
 
 func nextAvailblePort() string {
@@ -117,6 +122,6 @@ func nextAvailblePort() string {
 func StopAllPlugins() {
 	for k, v := range loadedPlugins {
 		log.Printf("Stopping plugin: %v\n", k)
-		v.Cmd.Process.Kill()
+		v.information.Cmd.Process.Kill()
 	}
 }

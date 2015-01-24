@@ -15,3 +15,6 @@ tasks:
         args:
         - "deployed!"
       - plugin: "ping"
+        args:
+          - "-c 3"
+          - "http://www.golang.org"

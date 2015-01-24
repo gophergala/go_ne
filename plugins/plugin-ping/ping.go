@@ -6,10 +6,7 @@ type Command struct {
 }
 
 func (t *Command) Execute(args plugin.Args, reply *plugin.Response) error {
-	*reply = plugin.NewResponse("ping", []string{
-		"-c 3",
-		"http://www.golang.org",
-	})
+	*reply = plugin.NewResponse("ping", args.Options)
 
 	return nil
 }

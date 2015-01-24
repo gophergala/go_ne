@@ -5,17 +5,20 @@ import (
 	"fmt"
 	"log"
 	"net"
-	"net/http"
 	"net/rpc"
+	"net/rpc/jsonrpc"
 )
 
 var host = flag.String("host", "localhost", "host for plugin server")
 var port = flag.String("port", "1234", "port for plugin server")
+var server = rpc.NewServer()
 
 // BUG(Tobscher) These arguments are passed from
 // the main process.
 type Args struct {
-	A, B int
+	// A, B int
+	Environment []string
+	Options     []string
 }
 
 type Response struct {
@@ -35,7 +38,7 @@ func NewResponse(name string, args []string) Response {
 }
 
 func Register(r Responder) {
-	rpc.Register(r)
+	server.Register(r)
 }
 
 func Serve() {
@@ -43,7 +46,7 @@ func Serve() {
 
 	address := getAddress()
 
-	rpc.HandleHTTP()
+	server.HandleHTTP(rpc.DefaultRPCPath, rpc.DefaultDebugPath)
 	l, e := net.Listen("tcp", address)
 	if e != nil {
 		log.Fatal("listen error:", e)
@@ -51,7 +54,14 @@ func Serve() {
 
 	log.Printf("Started plugin on `%v`\n", address)
 
-	http.Serve(l, nil)
+	for {
+		conn, err := l.Accept()
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		go server.ServeCodec(jsonrpc.NewServerCodec(conn))
+	}
 }
 
 func getAddress() string {
