@@ -64,9 +64,7 @@ func (r *Remote) Run(task core.Task) error {
 		return err
 	}
 
-	session.Wait()
-
-	return nil
+	return session.Wait()
 }
 
 // Close closes the SSH connection to the remote system

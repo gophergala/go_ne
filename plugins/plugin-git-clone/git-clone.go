@@ -9,16 +9,16 @@ type Command struct {
 }
 
 func (t *Command) Execute(args shared.Args, reply *shared.Response) error {
-	*reply = shared.NewResponse("ping", args.Options...)
+	*reply = shared.NewResponse("git clone", args.Options...)
 
 	return nil
 }
 
-func NewEnvCommand() *Command {
+func NewCommand() *Command {
 	return new(Command)
 }
 
 func main() {
-	plugin.Register(NewEnvCommand())
+	plugin.Register(NewCommand())
 	plugin.Serve()
 }

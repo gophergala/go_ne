@@ -1,4 +1,3 @@
----
 tasks:
   sayhello:
     steps:
@@ -8,15 +7,10 @@ tasks:
   deploy:
     steps:
       - command: /usr/bin/whoami
+      - plugin: env
+      - plugin: bootstrap
         args:
-      - plugin: "env"
-      - command: "echo"
+          - "git"
+      - plugin: git-clone
         args:
-        - "deploying..."
-      - command: "echo"
-        args:
-        - "deployed!"
-      - plugin: "ping"
-        args:
-          - "-c 3"
-          - "www.golang.org"
+          - "https://github.com/Tobscher/go-three.git"
