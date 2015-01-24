@@ -35,3 +35,7 @@ func (l *Local) Run(task core.Task) error {
 	fmt.Println(stdOut.String())
 	return nil
 }
+
+func (l *Local) Close() {
+
+}

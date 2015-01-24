@@ -50,4 +50,5 @@ func RunAll(runner Runner, config *Config) {
 	}
 
 	StopAllPlugins()
+	runner.Close()
 }

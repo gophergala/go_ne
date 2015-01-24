@@ -20,6 +20,5 @@ func main() {
 	}
 
 	runner, _ := NewRemoteRunner()
-
 	core.RunAll(runner, config)
 }
