@@ -65,10 +65,6 @@
 		
 		
 		function log(stream, message) {
-			if(!message) {	// Hack to remove empty messages
-				return;
-			}
-		
 			var section = $('section#output');
 			
 			var alert_type = (stream == "stderr") ? "alert" : "secondary";
