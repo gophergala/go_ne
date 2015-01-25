@@ -2,8 +2,9 @@ package core
 
 import (
 	"io"
-	"log"
 	"os/exec"
+
+	"log"
 	"strings"
 )
 
