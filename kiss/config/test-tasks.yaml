@@ -26,7 +26,7 @@ tasks:
       - command: cd example-app && go test -v
       - command: cd example-app && go build -v
       - command: supervisorctl start example-app
-      - command: curl http://178.62.29.201:8080/ >> /dev/null
+      - command: curl http://178.62.29.201:8080/
   start:
     steps:
       - command: supervisorctl start example-app
