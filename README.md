@@ -124,6 +124,14 @@ $ kiss -key=$HOME/.ssh/id_rsa
 
 Defines the key file to be used to connect via SSH.
 
+#### -config
+
+```
+$ kiss -config=.kiss-staging.yml
+```
+
+Defines the config file which includes the task definition. Default
+
 ## Plugins
 
 ### How it works
