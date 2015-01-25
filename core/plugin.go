@@ -2,20 +2,30 @@ package core
 
 import (
 	"fmt"
+	"log"
 	"net"
 	"net/rpc"
 	"net/rpc/jsonrpc"
 	"os"
 	"os/exec"
 	"strconv"
+	"sync"
 	"time"
 
 	"github.com/gophergala/go_ne/plugins/shared"
 	"github.com/mgutz/ansi"
 )
 
+// PluginCache stores loaded plugins
+type PluginCache struct {
+	sync.Mutex
+	cache map[string]*Plugin
+}
+
 var pluginPrefix = "plugin"
-var loadedPlugins = make(map[string]*Plugin)
+var loadedPlugins = PluginCache{
+	cache: make(map[string]*Plugin),
+}
 var startPort = 8000
 
 type Plugin struct {
@@ -86,7 +96,9 @@ func StartPlugin(name string) (*Plugin, error) {
 		client:      client,
 	}
 
-	loadedPlugins[name] = plugin
+	loadedPlugins.Lock()
+	loadedPlugins.cache[name] = plugin
+	loadedPlugins.Unlock()
 
 	return plugin, nil
 }
@@ -96,7 +108,7 @@ func GetPlugin(name string) (*Plugin, error) {
 	var ok bool
 	var err error
 
-	val, ok = loadedPlugins[name]
+	val, ok = loadedPlugins.cache[name]
 	if !ok {
 		val, err = StartPlugin(name)
 		if err != nil {
@@ -135,11 +147,16 @@ func nextAvailblePort() string {
 // BUG(Tobscher) Send signal to gracefully shutdown the plugin
 // BUG(Tobscher) Use lock
 func StopAllPlugins() {
-	for k, v := range loadedPlugins {
+	loadedPlugins.Lock()
+	defer loadedPlugins.Unlock()
+
+	for k, v := range loadedPlugins.cache {
 		fmt.Println(ansi.Color(fmt.Sprintf("-- Stopping plugin: %v", k), "black+h"))
-		v.information.Cmd.Process.Kill()
+		if err := v.information.Cmd.Process.Kill(); err != nil {
+			log.Println(err)
+		}
 	}
 
-	loadedPlugins = make(map[string]*Plugin)
+	loadedPlugins.cache = make(map[string]*Plugin)
 	startPort = 8000
 }
