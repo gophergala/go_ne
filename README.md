@@ -149,7 +149,7 @@ type Command struct {
 }
 
 func (t *Command) Execute(args shared.Args, reply *shared.Response) error {
-	*reply = shared.NewResponse("env")
+	*reply = shared.NewResponse(shared.NewCommand("env"))
 
 	return nil
 }
@@ -165,6 +165,8 @@ func main() {
 ```
 
 The example above defines a plugin which runs the `env` command on your server.
+
+Please refer to the [plugins directory](https://github.com/gophergala/go_ne/tree/master/plugins) for more examples.
 
 ## Limitations
 
