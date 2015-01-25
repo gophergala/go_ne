@@ -2,12 +2,20 @@
 
 ## Description
 
-kiss is a plugin-based automation tool which allows you to execute arbitrary tasks. It is intended
-to make deployment easier.
+kiss is a plugin-based automation tool which allows you to execute arbitrary tasks on a remote machine (or even locally). It is intended to make deployments easier.
 
 kiss can be used in two different ways:
 * Remote execution of scripts via SSH
 * Execution of scripts via the web interface
+
+The execution of your tasks is driven by a YAML file which can be placed in your projects root folder (`.kiss.yml`). Each task consists of an infinite number of steps. Tasks can be executed against a list of server groups (e.g. run task `mysqldump` against all servers in group `db`).
+
+Having your deployment scripts in a local place gives you and your team a number of benefits:
+* Team members don't have to remember how certain tasks have to be executed
+* You can easily add additional tasks by modifying a single configuration file
+* The configuration can be in version control (tasks don't get lost)
+
+The plugin-based architecture allows you to define more complex deployment tasks.
 
 This project has been developed during [Gopher Gala 2015](http://gophergala.com/).
 
@@ -43,6 +51,20 @@ servergroups:
       username: "vagrant"
       password: "vagrant"
       port: 2222
+    - host: www.example.org
+      username: "root"
+      key_path: "/path/to/private_key"
+  db:
+    - host: localhost
+      username: "vagrant"
+      password: "vagrant"
+      port: 2222
+    - host: db1.example.org
+      username: "db"
+      key_path: "/path/to/private_key"
+    - host: db2.example.org
+      username: "db"
+      key_path: "/path/to/private_key"
 
 tasks:
   setup:
