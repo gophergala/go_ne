@@ -28,15 +28,18 @@ type ConfigTask struct {
 }
 
 type ConfigEvent struct {
-	Type   string
-	Task   string
+	Type          string
+	Period        uint
+	Endpoint      string
+	ServerGroup   string
+	Task          string
 }
 	
 type Config struct {
 	Vars            map[string]string
 	ServerGroups    map[string][]ConfigServer
 	Tasks           map[string]ConfigTask
-	Events          map[string]ConfigEvent
+	Triggers        map[string]ConfigEvent
 	Interfaces      map[string]map[string]string
 }
 

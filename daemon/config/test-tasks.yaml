@@ -61,13 +61,23 @@ tasks:
       - command: "test"
         args:
         - "this should break"
-events:
+triggers:
+  testwebhook:
+    type: webhook
+    endpoint: prod
+    servergroup: localhost
+    task: sayhello
   gitpush:
     type: github-webhook
+    endpoint: gitpush
+    servergroup: localhost
     task: deploy
   monitor:
     type: periodic
-    task: ping
+    period: 5
+    servergroup: localhost
+    task: sayhello
 interfaces:
   web:
+    folder: /gokiss2
     port: 20001
