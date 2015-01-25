@@ -1,10 +1,42 @@
 ---
+vars:
+  mailgun_user: "uservaluehere"
+  mailgun_key: "keyvaluehere"
+servergroups:
+  localhost:
+  web:
+    - ip: 10.10.0.0
+      sshuser: "root"
+      sshpass: "password"
+      sshkeypath: "/var/ssh/keys/"
+      vars:
+        mailgun_user: "user2valuehere"
+        mailgun_key: "key2valuehere"
+    - ip: 10.10.0.1
+      sshuser: "root"
+      sshpass: "password"
+      sshkeypath: "/var/ssh/keys/"
+  database:
+    - ip: 10.10.0.2
+      sshuser: "root"
+      sshpass: "password"
+      sshkeypath: "/var/ssh/keys/"
+      vars:
+        mailgun_user: "user2valuehere"
+        mailgun_key: "key2valuehere"
 tasks:
   sayhello:
     steps:
       - command: "echo"
         args:
         - "hello"
+  mailhello:
+    steps:
+      - plugin: "mailgun"
+        args:
+          - "testdummy@creativenucleus.com"
+          - "Hello"
+          - "Just a test to say hello!"
   deploy:
     steps:
       - command: "echo"
@@ -29,3 +61,13 @@ tasks:
       - command: "test"
         args:
         - "this should break"
+events:
+  gitpush:
+    type: github-webhook
+    task: deploy
+  monitor:
+    type: periodic
+    task: ping
+interfaces:
+  web:
+    port: 20001

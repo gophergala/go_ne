@@ -50,19 +50,38 @@ func (l *Local) Run(task core.Task) (error) {
 	// COULDDO: Might be slicker to spin up two async processes that communicate back
 	bufferStdOut := make([]byte, READ_BUFFER_SIZE)
 	bufferStdErr := make([]byte, READ_BUFFER_SIZE)
+	listeningOut := true
+	listeningErr := true
 	for {
-		outBytes, err := stdOut.Read(bufferStdOut); if err != nil && err != io.EOF {
-			return err
+		if(listeningOut) {
+			outBytes, err := stdOut.Read(bufferStdOut); if err != nil {
+				if(err == io.EOF) {
+					listeningOut = false
+				} else {
+					return err
+				}
+			}
+			
+			if(outBytes > 0) {
+				l.chStdOut <- bufferStdOut[:outBytes]
+			}
 		}
-				
-		errBytes, err := stdOut.Read(bufferStdErr); if err != nil && err != io.EOF {
-			return err
+		
+		if(listeningErr) {
+			errBytes, err := stdOut.Read(bufferStdErr); if err != nil {
+				if(err == io.EOF) {
+					listeningErr = false
+				} else {
+					return err
+				}
+			}
+
+			if(errBytes > 0) {
+				l.chStdErr <- bufferStdErr[:errBytes]
+			}
 		}
-
-		l.chStdOut <- bufferStdOut[:outBytes]
-		l.chStdErr <- bufferStdErr[:errBytes]
-
-		if(outBytes == 0 && errBytes == 0) {
+		
+		if(!listeningOut && !listeningErr) {	// both complete
 			break
 		}
 	}

@@ -6,6 +6,16 @@ import (
 	"gopkg.in/yaml.v2"
 )
 
+
+type ConfigServer struct {
+	Ip           string
+	SshUser      string
+	SshKey       string
+	SshKeyPath   string
+	Vars         map[string]string
+}
+
+
 type ConfigStep struct {
 	Plugin  *string
 	Command *string
@@ -17,9 +27,19 @@ type ConfigTask struct {
 	Steps []ConfigStep
 }
 
-type Config struct {
-	Tasks map[string]ConfigTask
+type ConfigEvent struct {
+	Type   string
+	Task   string
 }
+	
+type Config struct {
+	Vars            map[string]string
+	ServerGroups    map[string][]ConfigServer
+	Tasks           map[string]ConfigTask
+	Events          map[string]ConfigEvent
+	Interfaces      map[string]map[string]string
+}
+
 
 func NewConfig() (*Config, error) {
 	c := Config{}
