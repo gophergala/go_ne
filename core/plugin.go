@@ -133,9 +133,13 @@ func nextAvailblePort() string {
 }
 
 // BUG(Tobscher) Send signal to gracefully shutdown the plugin
+// BUG(Tobscher) Use lock
 func StopAllPlugins() {
 	for k, v := range loadedPlugins {
 		fmt.Println(ansi.Color(fmt.Sprintf("-- Stopping plugin: %v", k), "black+h"))
 		v.information.Cmd.Process.Kill()
 	}
+
+	loadedPlugins = make(map[string]*Plugin)
+	startPort = 8000
 }
