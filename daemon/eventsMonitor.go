@@ -4,9 +4,10 @@ import(
 	"github.com/gophergala/go_ne/core"
 	"log"
 	"time"
-//	"fmt"
+	"fmt"
 	"net/http"
 	"io"
+	"encoding/json"
 )
 
 
@@ -65,11 +66,32 @@ func (em *EventsMonitor) createWebHook(config *core.Config, triggerName string, 
 }
 
 
+type githubHookData struct {
+	Ref string
+}
+
 
 //'push'
 func (em *EventsMonitor) createGitHubWebHook(config *core.Config, triggerName string, event core.ConfigEvent, web *Web) (error) {
-	web.mux.Get(web.webFolder + "/triggers/" + event.Endpoint, func(w http.ResponseWriter, r *http.Request) {
-		err := em.runTask(config, event.Task); if err != nil {
+	web.mux.Post(web.webFolder + "/triggers/" + event.Endpoint, func(w http.ResponseWriter, r *http.Request) {
+		fmt.Printf("%+v", r.Header)
+
+		if(r.Header.Get("Content-Type") != `application/json` || r.Header.Get("X-Github-Event") != `push`) {
+			return
+		}
+		
+		log.Printf("\n\n%+v\n", r.Body)
+
+		decoder := json.NewDecoder(r.Body)
+
+		var t githubHookData
+		err := decoder.Decode(&t); if err != nil {
+			fmt.Print(err)
+		}
+
+		log.Printf("%+v", t)
+
+		err = em.runTask(config, event.Task); if err != nil {
 			log.Printf("GitHub Webhook [start]: %s for %s\n", triggerName, event.ServerGroup)
 
 			// #TODO: Persistent Logging

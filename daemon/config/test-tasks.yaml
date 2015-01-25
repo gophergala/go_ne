@@ -70,14 +70,15 @@ triggers:
   gitpush:
     type: github-webhook
     endpoint: gitpush
+    secret: mygithubsecrethere
     servergroup: localhost
-    task: deploy
+    task: sayhello
   monitor:
     type: periodic
-    period: 5
+    period: 600
     servergroup: localhost
     task: sayhello
 interfaces:
   web:
-    folder: /gokiss2
-    port: 20001
+    folder: /gokiss
+    port: 20000
