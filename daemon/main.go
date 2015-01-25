@@ -6,6 +6,7 @@ import (
 	"github.com/gophergala/go_ne/core"
 	"strconv"
 	"errors"
+	"flag"
 )
 
 // BUG(Tobscher) use command line arguments to perform correct task
@@ -16,7 +17,13 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = config.Load("config/test-tasks.yaml"); if err != nil {
+	var configFilepath string
+	flag.StringVar(&configFilepath, "config", "config/test-tasks.yaml", "Path to your config file")
+	flag.Parse()
+	
+	log.Println(configFilepath)
+	
+	err = config.Load(configFilepath); if err != nil {
 		log.Fatal(err)
 	}
 	
