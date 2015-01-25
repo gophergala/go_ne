@@ -1,0 +1,17 @@
+{% extends "blocks/page/base.pongo" %}
+
+{% block main %}
+	<div class="row">
+		<div class="large-12 columns">
+			<h1>About</h1>
+			
+			<p>GoKiss - Go Kinetic Interactive Server System</p>
+
+			<p>This project has been developed during <a href="http://gophergala.com/" target="_blank">Gopher Gala 2015</a>.</p>
+			
+			<p>Contributions welcome: <a href="https://github.com/gophergala/go_ne" target="_blank">https://github.com/gophergala/go_ne</a></p>
+			
+			<p>MIT License. Copyright 2015 James Rutherford & Tobias Haar.</p>
+		</div>
+	</div>
+{% endblock %}

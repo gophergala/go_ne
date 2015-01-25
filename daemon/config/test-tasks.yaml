@@ -16,6 +16,14 @@ servergroups:
       sshuser: "root"
       sshpass: "password"
       sshkeypath: "/var/ssh/keys/"
+  database:
+    - ip: 10.10.0.2
+      sshuser: "root"
+      sshpass: "password"
+      sshkeypath: "/var/ssh/keys/"
+      vars:
+        mailgun_user: "user2valuehere"
+        mailgun_key: "key2valuehere"
 tasks:
   sayhello:
     steps:
