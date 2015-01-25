@@ -17,6 +17,12 @@ Describe how to deploy via the web interface...
 
 ## Deploy to a remote system
 
+Download the binary from GitHub:
+
+```
+$ go get github.com/gophergala/go_ne/cli
+```
+
 You can start your deployment by running the following command:
 
 ```
