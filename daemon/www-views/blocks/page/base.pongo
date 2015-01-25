@@ -37,9 +37,15 @@
 						<li>
 							<a href="{{ webfolder }}/about">About</a>
 						</li>
-						<li>
-							<a href="{{ webfolder }}/auth/log-in"><i class="fi-torso"></i>Log In</a>
-						</li>
+						{% if auth %}
+							<li>
+								<a href="{{ webfolder }}/auth/log-out"><i class="fi-torso"></i>Log Out</a>
+							</li>
+						{% else %}
+							<li>
+								<a href="{{ webfolder }}/auth/log-in"><i class="fi-torso"></i>Log In</a>
+							</li>
+						{% endif %}
 					</ul>
 				</section>
 			</nav>
