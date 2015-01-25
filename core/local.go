@@ -94,12 +94,12 @@ func (l *Local) Close() {
 
 }
 
-func LogOutput(runner *Local) {
+func LogOutput(runner Runner) {
 	for {
 		select {
-		case out := <-runner.chStdOut:
+		case out := <-runner.ChStdOut():
 			log.Printf("%s", out)
-		case out := <-runner.chStdErr:
+		case out := <-runner.ChStdErr():
 			log.Printf("%s", out)
 		}
 	}

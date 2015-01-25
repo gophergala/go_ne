@@ -45,10 +45,7 @@ func main() {
 			fail(err)
 		}
 
-		local, ok := runner.(*core.Local)
-		if ok {
-			go core.LogOutput(local)
-		}
+		go core.LogOutput(runner)
 
 		fmt.Println(ansi.Color(fmt.Sprintf("Executing `%v`", *taskName), "green"))
 		err = core.RunTask(runner, config, *taskName)
