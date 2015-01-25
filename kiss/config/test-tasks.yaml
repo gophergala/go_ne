@@ -1,0 +1,35 @@
+tasks:
+  setup:
+    steps:
+      - plugin: apt-get
+        options:
+          update: true
+          packages:
+            - "git"
+            - "golang"
+            - "python-setuptools"
+      - command: go version
+      - command: easy_install supervisor
+      - command: rm -rf example-app
+      - plugin: git-clone
+        options:
+          repo: "https://github.com/Tobscher/go-example-app.git"
+          directory: "example-app"
+      - command: cp example-app/supervisord.conf /etc/supervisord.conf
+      - command: supervisord
+  deploy:
+    steps:
+      - plugin: whoami
+      - plugin: env
+      - command: supervisorctl stop example-app
+      - command: cd example-app && git pull
+      - command: cd example-app && go test -v
+      - command: cd example-app && go build -v
+      - command: supervisorctl start example-app
+      - command: curl http://178.62.29.201:8080/ >> /dev/null
+  start:
+    steps:
+      - command: supervisorctl start example-app
+  stop:
+    steps:
+      - command: supervisorctl stop example-app

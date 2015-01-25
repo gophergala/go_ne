@@ -49,7 +49,7 @@ func RunTask(runner Runner, config *Config, taskName string) error {
 }
 
 func RunStep(runner Runner, s *ConfigStep) error {
-	var command *Command
+	var commands []*Command
 	var err error
 
 	if s.Plugin != nil {
@@ -61,24 +61,29 @@ func RunStep(runner Runner, s *ConfigStep) error {
 
 		pluginArgs := shared.Args{
 			Environment: os.Environ(),
-			Options:     s.Args,
+			Args:        s.Args,
+			Options:     s.Options,
 		}
 
-		command, err = p.GetCommand(pluginArgs)
+		commands, err = p.GetCommands(pluginArgs)
 		if err != nil {
 			return err
 		}
 	} else {
 		// Run arbitrary command
-		command, err = NewCommand(*s.Command, s.Args)
+		command, err := NewCommand(*s.Command, s.Args)
 		if err != nil {
 			return err
 		}
+
+		commands = append(commands, command)
 	}
 
-	err = runner.Run(command)
-	if err != nil {
-		return err
+	for _, c := range commands {
+		err = runner.Run(c)
+		if err != nil {
+			return err
+		}
 	}
 
 	return nil

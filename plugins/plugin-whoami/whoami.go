@@ -9,7 +9,7 @@ type Command struct {
 }
 
 func (t *Command) Execute(args shared.Args, reply *shared.Response) error {
-	*reply = shared.NewResponse("sudo apt-get install -y", args.Options...)
+	*reply = shared.NewResponse(shared.NewCommand("whoami"))
 
 	return nil
 }

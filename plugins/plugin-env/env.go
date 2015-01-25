@@ -9,7 +9,7 @@ type Command struct {
 }
 
 func (t *Command) Execute(args shared.Args, reply *shared.Response) error {
-	*reply = shared.NewResponse("env")
+	*reply = shared.NewResponse(shared.NewCommand("env"))
 
 	return nil
 }

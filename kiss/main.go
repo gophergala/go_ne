@@ -12,7 +12,8 @@ import (
 )
 
 var (
-	taskName = flag.String("task", "", "which task to run")
+	taskName   = flag.String("task", "", "which task to run")
+	configFile = flag.String("config", ".kiss.yml", "path to config file")
 )
 
 func main() {
@@ -23,7 +24,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	err = config.Load("config/test-tasks.yaml")
+	err = config.Load(*configFile)
 	if err != nil {
 		log.Fatal(err)
 	}

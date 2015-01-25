@@ -50,9 +50,9 @@ tasks:
         args:
         - "deployed!"
       - plugin: "ping"
-        args:
-          - "-c 3"
-          - "http://www.golang.org"
+        options:
+          count: 3
+          url: www.golang.org
   raiseerror:
     steps:
       - command: "echo"
