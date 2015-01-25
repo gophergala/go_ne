@@ -1,27 +1,10 @@
 ---
-vars:
-  mailgun_user: "uservaluehere"
-  mailgun_key: "keyvaluehere"
 servergroups:
-  localhost:
   web:
-    - host: 10.10.0.0
-      username: "root"
-      password: "password"
-      vars:
-        mailgun_user: "user2valuehere"
-        mailgun_key: "key2valuehere"
-    - host: 10.10.0.1
-      username: "root"
-      password: "password"
-      key_path: "/var/ssh/keys/"
-  database:
-    - host: 10.10.0.2
-      username: "root"
-      password: "password"
-      vars:
-        mailgun_user: "user2valuehere"
-        mailgun_key: "key2valuehere"
+    - host: localhost
+      username: "vagrant"
+      password: "vagrant"
+      port: 2222
 tasks:
   sayhello:
     steps:

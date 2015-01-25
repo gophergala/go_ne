@@ -38,6 +38,7 @@
 					ws.send(JSON.stringify({
 						"action": "task-run",
 						"args": {
+							"servergroupName": "{{ servergroupName }}",
 							"taskName": "{{ taskName }}"
 						}
 					}));

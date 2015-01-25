@@ -46,7 +46,6 @@ func main() {
 		}
 
 		local, ok := runner.(*core.Local)
-
 		if ok {
 			go core.LogOutput(local)
 		}

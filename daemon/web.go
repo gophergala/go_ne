@@ -380,9 +380,21 @@ func (web *Web) sockGokissTaskRun(config *core.Config) func(ws *websocket.Conn) 
 
 func (web *Web) taskRun(w io.Writer, taskName string, hosts []core.ConfigServer, config *core.Config) {
 	for _, host := range hosts {
+		web.sendResponseToSocket(w, WsResponse{
+			Type: "log",
+			Data: map[string]string{
+				"message": "Starting Task...",
+			},
+		})
+
 		runner, err := core.GetRunner(host)
 		if err != nil {
-			io.WriteString(w, "Error!")
+			web.sendResponseToSocket(w, WsResponse{
+				Type: "err",
+				Data: map[string]string{
+					"message": "Error when trying to run",
+				},
+			})
 			return
 		}
 		go logOutput(web, w, runner)
@@ -401,7 +413,12 @@ func (web *Web) taskRun(w io.Writer, taskName string, hosts []core.ConfigServer,
 			})
 		}
 
-		io.WriteString(w, "Complete!")
+		web.sendResponseToSocket(w, WsResponse{
+			Type: "log",
+			Data: map[string]string{
+				"message": "...Complete!",
+			},
+		})
 	}
 }
 
@@ -509,7 +526,7 @@ func logOutput(web *Web, w io.Writer, runner core.Runner) {
 	for {
 		select {
 		case out := <-runner.ChStdOut():
-			outString := fmt.Sprintf("%s", out)
+			outString := fmt.Sprintf("OUT: %s", out)
 			log.Print("OUT: " + outString)
 
 			// #TODO: Handle error...

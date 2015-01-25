@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
-	"os"
+	"io"
 	"strings"
 
 	"golang.org/x/crypto/ssh"
@@ -35,6 +35,8 @@ func NewRemoteRunner(options ConfigServer) (*Remote, error) {
 	}
 
 	return &Remote{
+		chStdOut: make(chan []byte),
+		chStdErr: make(chan []byte),
 		Client: client,
 	}, nil
 }
@@ -51,12 +53,61 @@ func (r *Remote) Run(task Task) error {
 
 	cmd := fmt.Sprintf("%v %v", task.Name(), strings.Join(task.Args(), " "))
 
-	session.Stdout = os.Stdout
-	session.Stderr = os.Stderr
+	stdOut, err := session.StdoutPipe()
+	if err != nil {
+		return err
+	}
+	
+	stdErr, err := session.StderrPipe()
+	if err != nil {
+		return err
+	}
+
 	if err := session.Start(cmd); err != nil {
 		return err
 	}
 
+	// COULDDO: Might be slicker to spin up two async processes that communicate back
+	bufferStdOut := make([]byte, READ_BUFFER_SIZE)
+	bufferStdErr := make([]byte, READ_BUFFER_SIZE)
+	listeningOut := true
+	listeningErr := true
+	for {
+		if listeningOut {
+			outBytes, err := stdOut.Read(bufferStdOut)
+			if err != nil {
+				if err == io.EOF {
+					listeningOut = false
+				} else {
+					return err
+				}
+			}
+
+			if outBytes > 0 {
+				r.ChStdOut() <- bufferStdOut[:outBytes]
+			}
+		}
+
+		if listeningErr {
+			errBytes, err := stdErr.Read(bufferStdErr)
+			if err != nil {
+				if err == io.EOF {
+					listeningErr = false
+				} else {
+					return err
+				}
+			}
+
+			if errBytes > 0 {
+				r.ChStdErr() <- bufferStdErr[:errBytes]
+			}
+		}
+
+		if !listeningOut && !listeningErr { // both complete
+			break
+		}
+	}
+		
 	return session.Wait()
 }
 

@@ -67,7 +67,7 @@ func (l *Local) Run(task Task) error {
 		}
 
 		if listeningErr {
-			errBytes, err := stdOut.Read(bufferStdErr)
+			errBytes, err := stdErr.Read(bufferStdErr)
 			if err != nil {
 				if err == io.EOF {
 					listeningErr = false
