@@ -1,20 +1,21 @@
 package core
 
 import (
+	"errors"
+	"fmt"
 	"io/ioutil"
 
 	"gopkg.in/yaml.v2"
 )
 
-
 type ConfigServer struct {
-	Ip           string
-	SshUser      string
-	SshKey       string
-	SshKeyPath   string
-	Vars         map[string]string
+	Host     string
+	Username string
+	Password string
+	Port     string
+	KeyPath  string `yaml:"key_path"`
+	Vars     map[string]string
 }
-
 
 type ConfigStep struct {
 	Plugin  *string
@@ -28,22 +29,21 @@ type ConfigTask struct {
 }
 
 type ConfigEvent struct {
-	Type          string
-	Period        uint
-	Endpoint      string
-	Secret        string
-	ServerGroup   string
-	Task          string
-}
-	
-type Config struct {
-	Vars            map[string]string
-	ServerGroups    map[string][]ConfigServer
-	Tasks           map[string]ConfigTask
-	Triggers        map[string]ConfigEvent
-	Interfaces      map[string]map[string]string
+	Type        string
+	Period      uint
+	Endpoint    string
+	Secret      string
+	ServerGroup string
+	Task        string
 }
 
+type Config struct {
+	Vars         map[string]string
+	ServerGroups map[string][]ConfigServer
+	Tasks        map[string]ConfigTask
+	Triggers     map[string]ConfigEvent
+	Interfaces   map[string]map[string]string
+}
 
 func NewConfig() (*Config, error) {
 	c := Config{}
@@ -62,4 +62,13 @@ func (c *Config) Load(filepath string) error {
 	}
 
 	return nil
+}
+
+func (c *Config) GetServerGroup(name string) ([]ConfigServer, error) {
+	value, ok := c.ServerGroups[name]
+	if !ok {
+		return []ConfigServer{}, errors.New(fmt.Sprintf("Server group `%v` not found.", name))
+	}
+
+	return value, nil
 }

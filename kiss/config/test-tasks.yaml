@@ -1,3 +1,10 @@
+servergroups:
+  web:
+    - host: localhost
+      username: "vagrant"
+      password: "vagrant"
+      port: 2222
+
 tasks:
   setup:
     steps:
@@ -9,14 +16,14 @@ tasks:
             - "golang"
             - "python-setuptools"
       - command: go version
-      - command: easy_install supervisor
+      - command: sudo easy_install supervisor
       - command: rm -rf example-app
       - plugin: git-clone
         options:
           repo: "https://github.com/Tobscher/go-example-app.git"
           directory: "example-app"
-      - command: cp example-app/supervisord.conf /etc/supervisord.conf
-      - command: supervisord
+      - command: sudo cp example-app/supervisord.conf /etc/supervisord.conf
+      - command: supervisord || echo "Looks like supervisord is already running"
   deploy:
     steps:
       - plugin: whoami
