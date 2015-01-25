@@ -23,10 +23,57 @@ Download the binary from GitHub:
 $ go get github.com/gophergala/go_ne/cli
 ```
 
-You can start your deployment by running the following command:
+You can start your deployment by running one of the following commands:
 
+* Authentication via username/password
 ```
-$ cli -task=deploy
+$ cli -host=name-or-ip -username=username -password=secret -task=deploy
+```
+
+* Authentication via private/public key:
+```
+$ cli -host=name-or-ip -key=/Users/your-user-name/.ssh/id_rsa -task=deploy
+```
+
+The commands above assume you have placed a `.kiss.yml` file in the root of your project. Here is an example
+configuration file:
+
+```yaml
+tasks:
+  setup:
+    steps:
+      - plugin: apt-get
+        options:
+          update: true
+          packages:
+            - "git"
+            - "golang"
+            - "python-setuptools"
+      - command: go version
+      - command: easy_install supervisor
+      - command: rm -rf example-app
+      - plugin: git-clone
+        options:
+          repo: "https://github.com/your-fork/go-example-app.git"
+          directory: "example-app"
+      - command: cp example-app/supervisord.conf /etc/supervisord.conf
+      - command: supervisord || echo "Looks like supervisord is already running"
+  deploy:
+    steps:
+      - plugin: whoami
+      - plugin: env
+      - command: supervisorctl stop example-app
+      - command: cd example-app && git pull
+      - command: cd example-app && go test -v
+      - command: cd example-app && go build -v
+      - command: supervisorctl start example-app
+      - command: curl http://your.server.org:8080/
+  start:
+    steps:
+      - command: supervisorctl start example-app
+  stop:
+    steps:
+      - command: supervisorctl stop example-app
 ```
 
 ### Options
