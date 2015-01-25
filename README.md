@@ -17,7 +17,7 @@ Describe how to deploy via the web interface...
 
 ## Deploy to a remote system
 
-![Preview](https://i.imgflip.com/gsz38.gif "kiss preview")
+![Preview](https://i.imgflip.com/gt47e.gif "kiss preview")
 
 Follow the example on [Tobscher/go-example-app](https://github.com/Tobscher/go-example-app#test-deployment-via-kiss) or do it manually:
 
