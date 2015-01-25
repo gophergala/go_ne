@@ -7,8 +7,11 @@ import(
 	"fmt"
 	"net/http"
 	"io"
+	"io/ioutil"
 	"encoding/json"
 	"crypto/sha1"
+	"crypto/hmac"
+	"encoding/hex"
 )
 
 
@@ -75,8 +78,6 @@ type githubHookData struct {
 //'push'
 func (em *EventsMonitor) createGitHubWebHook(config *core.Config, triggerName string, event core.ConfigEvent, web *Web) (error) {
 	web.mux.Post(web.webFolder + "/triggers/" + event.Endpoint, func(w http.ResponseWriter, r *http.Request) {
-		fmt.Printf("%+v", r.Header)
-
 		if(r.Header.Get("Content-Type") != `application/json` || r.Header.Get("X-Github-Event") != `push`) {
 			// #TODO: Log
 			return
@@ -89,9 +90,19 @@ func (em *EventsMonitor) createGitHubWebHook(config *core.Config, triggerName st
 				// #TODO: Log
 				return
 			}
-		
-			secretSha1 := sha1.Sum([]byte(event.Secret))
-			if(fmt.Sprintf("%s", secretSha1) != requestSecret) {
+
+			body, err := ioutil.ReadAll(r.Body); if err != nil {
+				// #TODO: Log
+				return
+			}
+
+			key := []byte(event.Secret)                                    
+			h := hmac.New(sha1.New, key)
+			h.Write(body)
+			secretSha1 := fmt.Sprintf("sha1=%s", hex.EncodeToString(h.Sum(nil)))
+
+			fmt.Printf("\n%s\n%s\n", secretSha1, requestSecret)
+			if(secretSha1 != requestSecret) {
 				// #TODO: Log
 				return			
 			}
