@@ -1,7 +1,4 @@
 ---
-vars:
-  mailgun_user: "uservaluehere"
-  mailgun_key: "keyvaluehere"
 servergroups:
   localhost:
   web:
@@ -31,10 +28,13 @@ tasks:
   mailhello:
     steps:
       - plugin: "mailgun"
-        args:
-          - "testdummy@creativenucleus.com"
-          - "Hello"
-          - "Just a test to say hello!"
+        options:
+          user: api:key-1b065977e9b7901aeb70334e5f1d87aa
+          endpoint: https://api.mailgun.net/v2/sandboxc68891711ef741188b13243239163728.mailgun.org/messages
+          from: Mailgun Sandbox <postmaster@sandboxc68891711ef741188b13243239163728.mailgun.org>
+          to: James <james+mailgun@creativenucleus.com>,
+          subject: Hello James,
+          text: Congratulations James, you just sent an email with Mailgun!  You are truly awesome!,
   deploy:
     steps:
       - command: "echo"
