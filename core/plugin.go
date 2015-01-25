@@ -86,7 +86,7 @@ func StartPlugin(name string) (*Plugin, error) {
 		client:      client,
 	}
 
-	LoadedPlugins[name] = plugin
+	loadedPlugins[name] = plugin
 
 	return plugin, nil
 }
