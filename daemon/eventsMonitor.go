@@ -172,16 +172,7 @@ func (em *EventsMonitor) runTask(config *core.Config, task string) error {
 	}
 
 	// #TODO: improve [/dev/null it for the moment!]
-	go func() {
-		for {
-			select {
-			case out := <-runner.ChStdOut:
-				log.Printf("%s", out)
-			case out := <-runner.ChStdErr:
-				log.Printf("%s", out)
-			}
-		}
-	}()
+	go core.LogOutput(runner)
 
 	err = core.RunTask(runner, config, task)
 	if err != nil {

@@ -5,22 +5,20 @@ vars:
 servergroups:
   localhost:
   web:
-    - ip: 10.10.0.0
-      sshuser: "root"
-      sshpass: "password"
-      sshkeypath: "/var/ssh/keys/"
+    - host: 10.10.0.0
+      username: "root"
+      password: "password"
       vars:
         mailgun_user: "user2valuehere"
         mailgun_key: "key2valuehere"
-    - ip: 10.10.0.1
-      sshuser: "root"
-      sshpass: "password"
-      sshkeypath: "/var/ssh/keys/"
+    - host: 10.10.0.1
+      username: "root"
+      password: "password"
+      key_path: "/var/ssh/keys/"
   database:
-    - ip: 10.10.0.2
-      sshuser: "root"
-      sshpass: "password"
-      sshkeypath: "/var/ssh/keys/"
+    - host: 10.10.0.2
+      username: "root"
+      password: "password"
       vars:
         mailgun_user: "user2valuehere"
         mailgun_key: "key2valuehere"

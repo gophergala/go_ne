@@ -9,12 +9,13 @@ import (
 )
 
 type ConfigServer struct {
-	Host     string
-	Username string
-	Password string
-	Port     string
-	KeyPath  string `yaml:"key_path"`
-	Vars     map[string]string
+	Host       string
+	Username   string
+	Password   string
+	Port       string
+	KeyPath    string `yaml:"key_path"`
+	RunLocally bool   `yaml:"run_locally"`
+	Vars       map[string]string
 }
 
 type ConfigStep struct {

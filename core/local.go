@@ -93,3 +93,14 @@ func (l *Local) Run(task Task) error {
 func (l *Local) Close() {
 
 }
+
+func LogOutput(runner *Local) {
+	for {
+		select {
+		case out := <-runner.ChStdOut:
+			log.Printf("%s", out)
+		case out := <-runner.ChStdErr:
+			log.Printf("%s", out)
+		}
+	}
+}

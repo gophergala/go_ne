@@ -27,22 +27,23 @@ Download the binary from GitHub:
 $ go get github.com/gophergala/go_ne/kiss
 ```
 
-You can start your deployment by running one of the following commands:
+You can start your deployment by running the following commands:
 
-* Authentication via username/password
 ```
-$ kiss -host=name-or-ip -username=username -password=secret -task=deploy
-```
-
-* Authentication via private/public key:
-```
-$ kiss -host=name-or-ip -key=/Users/your-user-name/.ssh/id_rsa -task=deploy
+$ kiss -group=web -task=deploy
 ```
 
 The commands above assume you have placed a `.kiss.yml` file in the root of your project. Here is an example
 configuration file:
 
 ```yaml
+servergroups:
+  web:
+    - host: localhost
+      username: "vagrant"
+      password: "vagrant"
+      port: 2222
+
 tasks:
   setup:
     steps:
@@ -84,45 +85,21 @@ TIP: You can use our test application to test the steps above: https://github.co
 
 ### Options
 
-#### -host
+#### -group
 
 ```
-$ kiss -host=www.example.org -task=deploy
+$ kiss -group=web
 ```
 
-Defines the remote host to connect to via SSH.
+Defines the group for which the task should run. This flag is mandatory.
 
-#### -port
-
-```
-$ kiss -port=23
-```
-
-Defines the port which is used to connect via SSH. Default: 22
-
-#### -username
+#### -task
 
 ```
-$ kiss -username=deployer -task=deploy
+$ kiss -task=deploy
 ```
 
-Defines the username to use to connect via SSH.
-
-#### -password
-
-```
-$ kiss -password=secret
-```
-
-Defines the password to be used to connect via SSH.
-
-#### -key
-
-```
-$ kiss -key=$HOME/.ssh/id_rsa
-```
-
-Defines the key file to be used to connect via SSH.
+Defines the task that should run. This flag is mandatory.
 
 #### -config
 
@@ -130,7 +107,7 @@ Defines the key file to be used to connect via SSH.
 $ kiss -config=.kiss-staging.yml
 ```
 
-Defines the config file which includes the task definition. Default
+Defines the config file which includes the task definition. Default .kiss.yml
 
 ## Plugins
 

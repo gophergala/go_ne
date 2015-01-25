@@ -40,3 +40,7 @@ tasks:
   stop:
     steps:
       - command: supervisorctl stop example-app
+  info:
+    steps:
+      - plugin: whoami
+      - plugin: env
