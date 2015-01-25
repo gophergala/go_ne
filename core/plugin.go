@@ -1,6 +1,7 @@
 package core
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net"
@@ -26,6 +27,7 @@ var pluginPrefix = "plugin"
 var loadedPlugins = PluginCache{
 	cache: make(map[string]*Plugin),
 }
+var maxAttempts = 5
 var startPort = 8000
 
 type Plugin struct {
@@ -70,18 +72,20 @@ func StartPlugin(name string) (*Plugin, error) {
 	}
 
 	var conn net.Conn
-	for i := 1; i <= 5; i++ {
+	for i := 1; i <= maxAttempts; i++ {
 		fmt.Print(ansi.Color(fmt.Sprintf("-- Attempt %v to connect to plugin...", i), "black+h"))
 
 		conn, err = net.Dial("tcp", info.Address())
 		if err != nil {
 			fmt.Println(ansi.Color("FAILED", "black+h"))
 			time.Sleep(100 * time.Millisecond)
-			continue
 
-			if i == 5 {
-				return nil, err
+			if i == maxAttempts {
+				cmd.Process.Kill()
+				return nil, errors.New("Could not connect to plugin.")
 			}
+
+			continue
 		}
 
 		fmt.Println(ansi.Color("OK", "black+h"))
