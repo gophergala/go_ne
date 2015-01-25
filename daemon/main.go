@@ -5,6 +5,7 @@ import (
 
 	"github.com/gophergala/go_ne/core"
 	"strconv"
+	"errors"
 )
 
 // BUG(Tobscher) use command line arguments to perform correct task
@@ -19,12 +20,17 @@ func main() {
 		log.Fatal(err)
 	}
 	
-	webFolder := config.Interfaces["web"]["folder"]
+	webFolder := config.Interfaces.Web.Settings["folder"]
 	if(webFolder == "") {
 		webFolder = "/gokiss"	// Default
 	}
 
-	w, err := NewWeb(webFolder); if err != nil {
+	sessionSecret := config.Interfaces.Web.Settings["sessionsecret"]
+	if(sessionSecret == "") {
+		log.Fatal(errors.New("Please set a sessionsecret for the web interface"))
+	}
+
+	w, err := NewWeb(webFolder, sessionSecret); if err != nil {
 		log.Fatal(err)
 	}
 
@@ -32,7 +38,7 @@ func main() {
 		log.Fatal(err)
 	}
 	
-	portString := config.Interfaces["web"]["port"]
+	portString := config.Interfaces.Web.Settings["port"]
 	port, err := strconv.ParseUint(portString, 10, 0)
 	if(portString == "" || err != nil) {
 		port = 20000	// Default

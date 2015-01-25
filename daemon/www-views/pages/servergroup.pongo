@@ -31,13 +31,13 @@
 				<table role="grid" class="fullWidth">
 					<thead>
 						<tr>
-							<th>IP</th>
+							<th>Host</th>
 						</tr>
 					</thead>				
 					<tbody>
 						{% for server in servergroup %}
 							<tr>
-								<td>{{ server.Ip }}</td>
+								<td>{{ server.Host }}</td>
 							</tr>
 						{% endfor %}
 					</tbody>

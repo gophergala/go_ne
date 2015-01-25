@@ -38,12 +38,30 @@ type ConfigEvent struct {
 	Task        string
 }
 
+
+type ConfigWebUsers struct {
+	Username   string
+	Password   string
+}
+
+	
+type ConfigWebInterface struct {
+	Settings   map[string]string
+	Users      []ConfigWebUsers
+}
+
+
+type ConfigInterfaces struct {
+	Web   ConfigWebInterface
+}
+
+
 type Config struct {
 	Vars         map[string]string
 	ServerGroups map[string][]ConfigServer
 	Tasks        map[string]ConfigTask
 	Triggers     map[string]ConfigEvent
-	Interfaces   map[string]map[string]string
+	Interfaces      ConfigInterfaces
 }
 
 func NewConfig() (*Config, error) {
@@ -61,6 +79,8 @@ func (c *Config) Load(filepath string) error {
 	if err != nil {
 		return err
 	}
+	
+	fmt.Printf("%+v", c)
 
 	return nil
 }

@@ -4,8 +4,22 @@
 	<div class="row">
 		<div class="large-12 columns">
 			<h1>Log In</h1>
-			
-			<p>Placeholder!</p>
+
+			<form method="POST">
+				<fieldset>
+					<legend>Log In</legend>
+
+					<label>Username
+						<input type="text" name="username" value="">
+					</label>
+
+					<label>Password
+						<input type="password" name="password" value="">
+					</label>
+
+					<input type="submit" value="Log In">
+				</fieldset>
+			</form>
 		</div>
 	</div>
 {% endblock %}

@@ -78,5 +78,12 @@ triggers:
     task: sayhello
 interfaces:
   web:
-    folder: /gokiss
-    port: 20000
+    settings:
+      folder: /gokiss
+      port: 20000
+      sessionsecret: eIvObvXEiCzUZ61doiOX
+    users:
+      - username: james
+        password: letmein
+      - username: tobias
+        password: sesame
