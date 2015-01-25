@@ -381,7 +381,7 @@ func (web *Web) sockGokissTaskRun(config *core.Config) func(ws *websocket.Conn) 
 
 
 func (web *Web) taskRun(w io.Writer, taskName string, config *core.Config) {
-	runner, err := NewLocalRunner()
+	runner, err := core.NewLocalRunner()
 	if err != nil {
 		io.WriteString(w, "Error!")
 		return
@@ -390,7 +390,7 @@ func (web *Web) taskRun(w io.Writer, taskName string, config *core.Config) {
 	go func() {
 		for {
 			select {
-			case out := <-runner.chStdOut:
+			case out := <-runner.ChStdOut:
 				outString := fmt.Sprintf("%s", out)
 				log.Print("OUT: " + outString)
 
@@ -402,7 +402,7 @@ func (web *Web) taskRun(w io.Writer, taskName string, config *core.Config) {
 					},
 				})
 
-			case out := <-runner.chStdErr:
+			case out := <-runner.ChStdErr:
 				outString := fmt.Sprintf("%s", out)
 				log.Print("ERR: " + outString)
 

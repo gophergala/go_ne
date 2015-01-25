@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"errors"
@@ -11,16 +11,7 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"github.com/gophergala/go_ne/core"
 	"github.com/mgutz/ansi"
-)
-
-var (
-	username = flag.String("username", "root", "username for remote server")
-	password = flag.String("password", "", "password for remote server")
-	key      = flag.String("key", "", "path to private key")
-	host     = flag.String("host", "", "host for remote server")
-	port     = flag.String("port", "22", "ssh port")
 )
 
 // Remote describes a runner which runs task
@@ -33,10 +24,10 @@ type Remote struct {
 // tasks on a remote system.
 //
 // An SSH connection will be establishe.
-func NewRemoteRunner() (*Remote, error) {
+func NewRemoteRunner(options ConfigServer) (*Remote, error) {
 	flag.Parse()
 
-	client, err := createClient(*username, *password, *host, *port, *key)
+	client, err := createClient(options.Username, options.Password, options.Host, options.Port, options.KeyPath)
 	if err != nil {
 		return nil, err
 	}
@@ -47,7 +38,7 @@ func NewRemoteRunner() (*Remote, error) {
 }
 
 // Run runs the given task on the remote system
-func (r *Remote) Run(task core.Task) error {
+func (r *Remote) Run(task Task) error {
 	session, err := r.Client.NewSession()
 	if err != nil {
 		return errors.New("Failed to create session: " + err.Error())
@@ -98,8 +89,8 @@ func createClient(username, password, host, port, key string) (*ssh.Client, erro
 		Auth: authMethods,
 	}
 
-	if len(host) == 0 {
-		return nil, errors.New("Please select the host you want to deploy to via `-host=name` flag")
+	if len(port) == 0 {
+		port = "22"
 	}
 
 	remoteServer := fmt.Sprintf("%v:%v", host, port)
