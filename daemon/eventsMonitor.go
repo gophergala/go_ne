@@ -8,6 +8,7 @@ import(
 	"net/http"
 	"io"
 	"encoding/json"
+	"crypto/sha1"
 )
 
 
@@ -77,8 +78,28 @@ func (em *EventsMonitor) createGitHubWebHook(config *core.Config, triggerName st
 		fmt.Printf("%+v", r.Header)
 
 		if(r.Header.Get("Content-Type") != `application/json` || r.Header.Get("X-Github-Event") != `push`) {
+			// #TODO: Log
 			return
 		}
+		
+	// If we've specified a secret in the YAML then check it...
+		if(event.Secret != "") {
+			requestSecret := r.Header.Get("X-Hub-Signature")
+			if(requestSecret == "") {
+				// #TODO: Log
+				return
+			}
+		
+			secretSha1 := sha1.Sum([]byte(event.Secret))
+			if(fmt.Sprintf("%s", secretSha1) != requestSecret) {
+				// #TODO: Log
+				return			
+			}
+		}
+		
+		
+		
+		
 		
 		log.Printf("\n\n%+v\n", r.Body)
 

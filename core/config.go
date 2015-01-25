@@ -30,6 +30,7 @@ type ConfigEvent struct {
 	Type          string
 	Period        uint
 	Endpoint      string
+	Secret        string
 	ServerGroup   string
 	Task          string
 }
