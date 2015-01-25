@@ -12,15 +12,26 @@ footer {
 	color: #808080;
 }
 
-div.stdout, div.stderr {
-	border: 1px solid #c0c0c0;
-	margin-bottom: 5px;
+.top-bar,
+.top-bar-section li:not(.has-form) a:not(.button) {
+	background-color: #c9f3ff;
 }
 
-div.stdout {
-	background-color: #efffef;
+.top-bar {
+	box-shadow: 0 0 1px 0px #505f5b;
 }
 
-div.stderr {
-	background-color: #ffefef;
+.top-bar .name h1 a,
+.top-bar .name h2 a,
+.top-bar .name h3 a,
+.top-bar .name h4 a,
+.top-bar .name p a,
+.top-bar .name span a,
+.top-bar-section ul li > a,
+.top-bar .toggle-topbar.menu-icon a {
+	color: #505f5b;
+}
+
+.top-bar .toggle-topbar.menu-icon a span::after {
+	box-shadow: 0 0 0 1px #505f5b, 0 7px 0 1px #505f5b, 0 14px 0 1px #505f5b;
 }

@@ -54,10 +54,13 @@ func (web *Web) Serve(port uint, config *core.Config) (error) {
 		http.StripPrefix(WEB_FOLDER + "/static/", http.FileServer(http.Dir("./www-static")))))
 	
 	// Serve web...
-	mux.Get(WEB_FOLDER + "/", web.wwwGokiss())
+	mux.Get(WEB_FOLDER + "/", web.wwwGokiss(config))
+	mux.Get(WEB_FOLDER + "/about", web.wwwGokissAbout())
+	mux.Get(WEB_FOLDER + "/servergroup", web.wwwGokissServergroups(config))
+	mux.Get(WEB_FOLDER + "/servergroup/:servergroupName", web.wwwGokissServergroup(config))
 	mux.Get(WEB_FOLDER + "/task", web.wwwGokissTasks(config))
-	mux.Get(WEB_FOLDER + "/task/:taskName/runstatic", web.wwwGokissTaskRunStatic(config))
-	mux.Get(WEB_FOLDER + "/task/:taskName/run", web.wwwGokissTaskRun(config))
+	mux.Get(WEB_FOLDER + "/servergroup/:servergroupName/task/:taskName/runstatic", web.wwwGokissTaskRunStatic(config))
+	mux.Get(WEB_FOLDER + "/servergroup/:servergroupName/task/:taskName/run", web.wwwGokissTaskRun(config))
 	mux.Get(WEB_FOLDER + "/auth/log-in", web.wwwGokissAuthLogin())
     http.Handle(WEB_FOLDER + "/socket", websocket.Handler(web.sockGokissTaskRun(config)))
 
@@ -68,7 +71,7 @@ func (web *Web) Serve(port uint, config *core.Config) (error) {
 }
 
 
-func (web *Web) wwwGokiss() func(w http.ResponseWriter, r *http.Request) {
+func (web *Web) wwwGokiss(config *core.Config) func(w http.ResponseWriter, r *http.Request) {
 	tpl, err := web.tplSet.FromCache("pages/index.pongo"); if err != nil {
 		log.Fatal(err)
 	}
@@ -77,6 +80,77 @@ func (web *Web) wwwGokiss() func(w http.ResponseWriter, r *http.Request) {
 		out, err := tpl.Execute(pongo2.Context{
 			"webfolder": WEB_FOLDER,
 			"title": "Overview",
+			"servergroups": config.ServerGroups,
+		}); if err != nil {
+			web.errorHandler(w, http.StatusInternalServerError)
+			return
+		}
+		
+		io.WriteString(w, out)		
+	}
+}
+
+
+
+func (web *Web) wwwGokissServergroups(config *core.Config) func(w http.ResponseWriter, r *http.Request) {
+	tpl, err := web.tplSet.FromCache("pages/servergroups.pongo"); if err != nil {
+		log.Fatal(err)
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		out, err := tpl.Execute(pongo2.Context{
+			"webfolder": WEB_FOLDER,
+			"title": "Overview",
+			"servergroups": config.ServerGroups,
+		}); if err != nil {
+			web.errorHandler(w, http.StatusInternalServerError)
+			return
+		}
+		
+		io.WriteString(w, out)		
+	}
+}
+
+
+func (web *Web) wwwGokissAbout() func(w http.ResponseWriter, r *http.Request) {
+	tpl, err := web.tplSet.FromCache("pages/about.pongo"); if err != nil {
+		log.Fatal(err)
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		out, err := tpl.Execute(pongo2.Context{
+			"webfolder": WEB_FOLDER,
+			"title": "About",
+		}); if err != nil {
+			web.errorHandler(w, http.StatusInternalServerError)
+			return
+		}
+		
+		io.WriteString(w, out)		
+	}
+}
+
+
+func (web *Web) wwwGokissServergroup(config *core.Config) func(w http.ResponseWriter, r *http.Request) {
+	tpl, err := web.tplSet.FromCache("pages/servergroup.pongo"); if err != nil {
+		log.Fatal(err)
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		params := r.URL.Query()
+		servergroupName := params.Get(":servergroupName")
+
+		servergroup, ok := config.ServerGroups[servergroupName]; if !ok {
+			web.errorHandler(w, http.StatusNotFound)		
+			return
+		}
+				
+		out, err := tpl.Execute(pongo2.Context{
+			"webfolder": WEB_FOLDER,
+			"title": "Overview",
+			"servergroupName": servergroupName,
+			"servergroup": servergroup,
+			"tasks": config.Tasks,
 		}); if err != nil {
 			web.errorHandler(w, http.StatusInternalServerError)
 			return
@@ -247,9 +321,8 @@ func (web *Web) taskRun(w io.Writer, taskName string, config *core.Config) {
 			Data: map[string]string{
 				"message": outString,
 			},
-		})	
+		})
 	}
-	log.Printf("3")
 		
 	io.WriteString(w, "Complete!")
 }

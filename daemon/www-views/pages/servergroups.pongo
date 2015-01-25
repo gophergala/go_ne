@@ -3,18 +3,20 @@
 {% block main %}
 	<div class="row">
 		<div class="large-12 columns">
-			<h1>Tasks</h1>
+			<h1>Overview</h1>
 			
 			<table role="grid" class="fullWidth">
 				<thead>
 					<tr>
 						<th>Name</th>
+						<th><i class="fi-widget"></i></th>
 					</tr>
 				</thead>				
 				<tbody>
-					{% for taskName, task in tasks %}
+					{% for servergroupName, servergroup in servergroups %}
 						<tr>
-							<td>{{ taskName }}</td>
+							<td>{{ servergroupName }}</td>
+							<td><a href="{{ webfolder }}/servergroup/{{ servergroupName }}">View</a></td>
 						</tr>
 					{% endfor %}
 				</tbody>

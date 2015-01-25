@@ -4,6 +4,12 @@
 	<div class="row">
 		<div class="large-12 columns">
 			<h1>Overview</h1>
+			
+			<p>GoKiss - Go Kinetic Interactive Server System</p>
+			
+			<p><a href="{{ webfolder }}/about">About this project</a></p>
+			
+			<p><a href="{{ webfolder }}/servergroup">Manage your server(s)</a></p>
 		</div>
 	</div>
 {% endblock %}
