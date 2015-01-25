@@ -4,6 +4,7 @@ import (
 	"log"
 
 	"github.com/gophergala/go_ne/core"
+	"strconv"
 )
 
 // BUG(Tobscher) use command line arguments to perform correct task
@@ -19,10 +20,17 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
-
+	
 	w, err := NewWeb(); if err != nil {
 		log.Fatal(err)
 	}
 
-	w.Serve(20000, config)
+	portString := config.Interfaces["web"]["port"]
+	port, err := strconv.ParseUint(portString, 10, 0)
+	if(portString == "" || err != nil) {
+		port = 20000	// Default
+	}
+	
+	log.Printf("Web interface serving on port %d", port)	
+	w.Serve(uint(port), config)
 }
