@@ -16,10 +16,14 @@ var host = flag.String("host", "localhost", "host for plugin server")
 var port = flag.String("port", "1234", "port for plugin server")
 var server = rpc.NewServer()
 
+// Register registers the given responder to be used as a plugin.
+// The plugin will be able to receive calls via RPC.
+// Please make sure your struct is called `Command` as the remote call is `Command.Execute`
 func Register(r shared.Responder) {
 	server.Register(r)
 }
 
+// Serve Starts the server and listens to it.
 func Serve() {
 	flag.Parse()
 
