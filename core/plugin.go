@@ -40,11 +40,13 @@ func StartPlugin(name string) (*Plugin, error) {
 
 	fmt.Println(ansi.Color(fmt.Sprintf("-- Starting plugin `%v` on port %v", name, port), "black+h"))
 
+	// Log to logfile
 	cmd := exec.Command(command,
 		fmt.Sprintf("-host=%v", host),
 		fmt.Sprintf("-port=%v", port),
 	)
 	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
 	err := cmd.Start()
 	if err != nil {
@@ -104,18 +106,25 @@ func GetPlugin(name string) (*Plugin, error) {
 	return val, nil
 }
 
-func (p *Plugin) GetCommand(args shared.Args) (*Command, error) {
-	// Pass in environment
+func (p *Plugin) GetCommands(args shared.Args) ([]*Command, error) {
 	var reply shared.Response
+	var commands []*Command
+
 	err := p.client.Call("Command.Execute", args, &reply)
 	if err != nil {
 		return nil, err
 	}
 
-	return &Command{
-		name: reply.Name,
-		args: reply.Args,
-	}, nil
+	for _, value := range reply.Commands {
+		command := &Command{
+			name: value.Name,
+			args: value.Args,
+		}
+
+		commands = append(commands, command)
+	}
+
+	return commands, nil
 }
 
 func nextAvailblePort() string {

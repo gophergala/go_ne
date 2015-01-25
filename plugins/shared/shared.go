@@ -2,21 +2,30 @@ package shared
 
 type Args struct {
 	Environment []string
-	Options     []string
+	Args        []string
+	Options     map[string]interface{}
+}
+
+type Command struct {
+	Name string
+	Args []string
 }
 
 type Response struct {
-	Name string
-	Args []string
+	Commands []Command
 }
 
 type Responder interface {
 	Execute(args Args, reply *Response) error
 }
 
-func NewResponse(name string, args ...string) Response {
-	return Response{
+func NewCommand(name string, args ...string) Command {
+	return Command{
 		Name: name,
 		Args: args,
 	}
+}
+
+func NewResponse(commands ...Command) Response {
+	return Response{Commands: commands}
 }

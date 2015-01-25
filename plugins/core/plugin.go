@@ -9,6 +9,7 @@ import (
 	"net/rpc/jsonrpc"
 
 	"github.com/gophergala/go_ne/plugins/shared"
+	"github.com/mgutz/ansi"
 )
 
 var host = flag.String("host", "localhost", "host for plugin server")
@@ -30,7 +31,7 @@ func Serve() {
 		log.Fatal("listen error:", e)
 	}
 
-	log.Printf("Started plugin on `%v`\n", address)
+	fmt.Println(ansi.Color(fmt.Sprintf("Started plugin on `%v`", address), "black+h"))
 
 	for {
 		conn, err := l.Accept()

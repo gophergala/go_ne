@@ -9,6 +9,7 @@ import (
 type ConfigStep struct {
 	Plugin  *string
 	Command *string
+	Options map[string]interface{}
 	Args    []string
 }
 
