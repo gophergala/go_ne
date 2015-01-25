@@ -11,20 +11,27 @@ import (
 func main() {
 	log.SetPrefix("[go-ne] ")
 
-	config, err := core.NewConfig()
-	if err != nil {
+	config, err := core.NewConfig(); if err != nil {
 		log.Fatal(err)
 	}
 
-	err = config.Load("config/test-tasks.yaml")
-	if err != nil {
+	err = config.Load("config/test-tasks.yaml"); if err != nil {
 		log.Fatal(err)
 	}
 	
-	w, err := NewWeb(); if err != nil {
+	webFolder := config.Interfaces["web"]["folder"]
+	if(webFolder == "") {
+		webFolder = "/gokiss"	// Default
+	}
+
+	w, err := NewWeb(webFolder); if err != nil {
 		log.Fatal(err)
 	}
 
+	_, err = NewEventsMonitor(config, w); if err != nil {
+		log.Fatal(err)
+	}
+	
 	portString := config.Interfaces["web"]["port"]
 	port, err := strconv.ParseUint(portString, 10, 0)
 	if(portString == "" || err != nil) {
