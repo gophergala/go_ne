@@ -12,13 +12,14 @@ import (
 	"encoding/json"
 )
 
-const WEB_FOLDER = "/gokiss"
 const STATIC_CACHE_SECONDS = 3600
 const WS_READ_BUFFER_SIZE = 1024
 
 
 type Web struct {
-	tplSet   *pongo2.TemplateSet 
+	tplSet      *pongo2.TemplateSet
+	mux         *routes.RouteMux
+	webFolder   string
 }
 
 
@@ -33,38 +34,40 @@ type WsResponse struct {
 }
 
 
-func NewWeb() (*Web, error) {
-	w := Web{}
+func NewWeb(webFolder string) (*Web, error) {
+	w := Web{
+		webFolder: webFolder,
+	}
 	
 	w.tplSet = pongo2.NewSet("www")
 	err := w.tplSet.SetBaseDirectory("www-views/"); if err != nil {
 		return nil, err
 	}
 	
+	w.mux = routes.New()
+	
 	return &w, nil
 }
 
 
 func (web *Web) Serve(port uint, config *core.Config) (error) {
-	mux := routes.New()
-	
 	// Serve static assets...
-	http.Handle(WEB_FOLDER + "/static/", maxAgeHandler(
+	http.Handle(web.webFolder + "/static/", maxAgeHandler(
 		STATIC_CACHE_SECONDS,
-		http.StripPrefix(WEB_FOLDER + "/static/", http.FileServer(http.Dir("./www-static")))))
+		http.StripPrefix(web.webFolder + "/static/", http.FileServer(http.Dir("./www-static")))))
 	
 	// Serve web...
-	mux.Get(WEB_FOLDER + "/", web.wwwGokiss(config))
-	mux.Get(WEB_FOLDER + "/about", web.wwwGokissAbout())
-	mux.Get(WEB_FOLDER + "/servergroup", web.wwwGokissServergroups(config))
-	mux.Get(WEB_FOLDER + "/servergroup/:servergroupName", web.wwwGokissServergroup(config))
-	mux.Get(WEB_FOLDER + "/task", web.wwwGokissTasks(config))
-	mux.Get(WEB_FOLDER + "/servergroup/:servergroupName/task/:taskName/runstatic", web.wwwGokissTaskRunStatic(config))
-	mux.Get(WEB_FOLDER + "/servergroup/:servergroupName/task/:taskName/run", web.wwwGokissTaskRun(config))
-	mux.Get(WEB_FOLDER + "/auth/log-in", web.wwwGokissAuthLogin())
-    http.Handle(WEB_FOLDER + "/socket", websocket.Handler(web.sockGokissTaskRun(config)))
+	web.mux.Get(web.webFolder + "/", web.wwwGokiss(config))
+	web.mux.Get(web.webFolder + "/about", web.wwwGokissAbout())
+	web.mux.Get(web.webFolder + "/servergroup", web.wwwGokissServergroups(config))
+	web.mux.Get(web.webFolder + "/servergroup/:servergroupName", web.wwwGokissServergroup(config))
+	web.mux.Get(web.webFolder + "/task", web.wwwGokissTasks(config))
+	web.mux.Get(web.webFolder + "/servergroup/:servergroupName/task/:taskName/runstatic", web.wwwGokissTaskRunStatic(config))
+	web.mux.Get(web.webFolder + "/servergroup/:servergroupName/task/:taskName/run", web.wwwGokissTaskRun(config))
+	web.mux.Get(web.webFolder + "/auth/log-in", web.wwwGokissAuthLogin())
+    http.Handle(web.webFolder + "/socket", websocket.Handler(web.sockGokissTaskRun(config)))
 
-	http.Handle("/", mux)
+	http.Handle("/", web.mux)
 	http.ListenAndServe(fmt.Sprintf(":%d", port), nil)
 	
 	return nil
@@ -78,7 +81,7 @@ func (web *Web) wwwGokiss(config *core.Config) func(w http.ResponseWriter, r *ht
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		out, err := tpl.Execute(pongo2.Context{
-			"webfolder": WEB_FOLDER,
+			"webfolder": web.webFolder,
 			"title": "Overview",
 			"servergroups": config.ServerGroups,
 		}); if err != nil {
@@ -86,7 +89,7 @@ func (web *Web) wwwGokiss(config *core.Config) func(w http.ResponseWriter, r *ht
 			return
 		}
 		
-		io.WriteString(w, out)		
+		io.WriteString(w, out)
 	}
 }
 
@@ -99,7 +102,7 @@ func (web *Web) wwwGokissServergroups(config *core.Config) func(w http.ResponseW
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		out, err := tpl.Execute(pongo2.Context{
-			"webfolder": WEB_FOLDER,
+			"webfolder": web.webFolder,
 			"title": "Overview",
 			"servergroups": config.ServerGroups,
 		}); if err != nil {
@@ -119,7 +122,7 @@ func (web *Web) wwwGokissAbout() func(w http.ResponseWriter, r *http.Request) {
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		out, err := tpl.Execute(pongo2.Context{
-			"webfolder": WEB_FOLDER,
+			"webfolder": web.webFolder,
 			"title": "About",
 		}); if err != nil {
 			web.errorHandler(w, http.StatusInternalServerError)
@@ -146,7 +149,7 @@ func (web *Web) wwwGokissServergroup(config *core.Config) func(w http.ResponseWr
 		}
 				
 		out, err := tpl.Execute(pongo2.Context{
-			"webfolder": WEB_FOLDER,
+			"webfolder": web.webFolder,
 			"title": "Overview",
 			"servergroupName": servergroupName,
 			"servergroup": servergroup,
@@ -168,7 +171,7 @@ func (web *Web) wwwGokissTasks(config *core.Config) func(w http.ResponseWriter, 
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		out, err := tpl.Execute(pongo2.Context{
-			"webfolder": WEB_FOLDER,
+			"webfolder": web.webFolder,
 			"title": "Tasks",
 			"tasks": config.Tasks,
 		}); if err != nil {
@@ -189,7 +192,7 @@ func (web *Web) wwwGokissAuthLogin() func(w http.ResponseWriter, r *http.Request
 
 	return func(w http.ResponseWriter, r *http.Request) {
 		out, err := tpl.Execute(pongo2.Context{
-			"webfolder": WEB_FOLDER,
+			"webfolder": web.webFolder,
 			"title": "Log In",
 		}); if err != nil {
 			web.errorHandler(w, http.StatusInternalServerError)
@@ -224,7 +227,7 @@ func (web *Web) wwwGokissTaskRun(config *core.Config) func(w http.ResponseWriter
 
 		out, err := tpl.Execute(pongo2.Context{
 			"host": r.Host,
-			"webfolder": WEB_FOLDER,
+			"webfolder": web.webFolder,
 			"title": "Run Task",
 			"taskName": taskName,
 		}); if err != nil {
@@ -272,15 +275,10 @@ func (web *Web) taskRun(w io.Writer, taskName string, config *core.Config) {
 		return	
 	}
 
-	// #TODO: Fix this - lots of zero-length messages flying around...
 	go func() {
 		for {
 			select {
-				case out := <-runner.chStdOut:
-					if(len(out) == 0) {
-//						break;
-					}
-					
+				case out := <-runner.chStdOut:				
 					outString := fmt.Sprintf("%s", out)
 					log.Print("OUT: " + outString)
 
@@ -293,10 +291,6 @@ func (web *Web) taskRun(w io.Writer, taskName string, config *core.Config) {
 					})
 
 				case out := <-runner.chStdErr:
-					if(len(out) == 0) {
-//						break;
-					}
-				
 					outString := fmt.Sprintf("%s", out)
 					log.Print("ERR: " + outString)
 
