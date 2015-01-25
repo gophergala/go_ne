@@ -2,7 +2,7 @@
 
 ## Description
 
-kiss is an automation tool which allows you to execute arbitrary tasks. It is intended
+kiss is a plugin-based automation tool which allows you to execute arbitrary tasks. It is intended
 to make deployment easier.
 
 kiss can be used in two different ways:
