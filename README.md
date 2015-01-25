@@ -17,6 +17,8 @@ Describe how to deploy via the web interface...
 
 ## Deploy to a remote system
 
+Follow the example on [Tobscher/go-example-app](https://github.com/Tobscher/go-example-app#test-deployment-via-kiss) or do it manually:
+
 Download the binary from GitHub:
 
 ```
