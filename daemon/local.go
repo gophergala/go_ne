@@ -3,10 +3,10 @@ package main
 import (
 	"io"
 	"os/exec"
-//	"strings"
 
 	"github.com/gophergala/go_ne/core"
-//	"log"
+	"log"
+	"strings"
 )
 
 
@@ -30,7 +30,7 @@ func NewLocalRunner() (*Local, error) {
 
 
 func (l *Local) Run(task core.Task) (error) {
-	//log.Printf("Running task: %v %v\n", task.Name(), strings.Join(task.Args(), " "))
+	log.Printf("Running task: %v %v\n", task.Name(), strings.Join(task.Args(), " "))
 
 	cmd := exec.Command(task.Name(), task.Args()...)
 	stdOut, err := cmd.StdoutPipe(); if err != nil {
