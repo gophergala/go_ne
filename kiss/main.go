@@ -29,7 +29,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	runner, err := NewRemoteRunner()
+	runner, err := core.NewRemoteRunner()
 	if err != nil {
 		fail(err)
 	}

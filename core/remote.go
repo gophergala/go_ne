@@ -1,4 +1,4 @@
-package main
+package core
 
 import (
 	"errors"
@@ -11,7 +11,6 @@ import (
 
 	"golang.org/x/crypto/ssh"
 
-	"github.com/gophergala/go_ne/core"
 	"github.com/mgutz/ansi"
 )
 
@@ -47,7 +46,7 @@ func NewRemoteRunner() (*Remote, error) {
 }
 
 // Run runs the given task on the remote system
-func (r *Remote) Run(task core.Task) error {
+func (r *Remote) Run(task Task) error {
 	session, err := r.Client.NewSession()
 	if err != nil {
 		return errors.New("Failed to create session: " + err.Error())
