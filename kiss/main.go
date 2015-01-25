@@ -40,19 +40,15 @@ func main() {
 	for _, host := range hosts {
 		fmt.Println(ansi.Color(fmt.Sprintf("Selecting host `%v`", host.Host), "green"))
 
-		var runner core.Runner
-		if host.RunLocally {
-			runner, err = core.NewLocalRunner()
-			if err != nil {
-				fail(err)
-			}
-			go core.LogOutput(runner.(*core.Local))
+		runner, err := core.GetRunner(host)
+		if err != nil {
+			fail(err)
+		}
 
-		} else {
-			runner, err = core.NewRemoteRunner(host)
-			if err != nil {
-				fail(err)
-			}
+		local, ok := runner.(*core.Local)
+
+		if ok {
+			go core.LogOutput(local)
 		}
 
 		fmt.Println(ansi.Color(fmt.Sprintf("Executing `%v`", *taskName), "green"))

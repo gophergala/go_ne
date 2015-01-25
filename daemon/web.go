@@ -24,7 +24,6 @@ type Web struct {
 	sessionStore *sessions.CookieStore
 }
 
-
 type WsRequest struct {
 	Action string
 	Args   map[string]string
@@ -37,7 +36,7 @@ type WsResponse struct {
 
 func NewWeb(webFolder string, sessionSecret string) (*Web, error) {
 	web := Web{
-		webFolder: webFolder,
+		webFolder:    webFolder,
 		sessionStore: sessions.NewCookieStore([]byte(sessionSecret)),
 	}
 
@@ -76,9 +75,9 @@ func (web *Web) Serve(port uint, config *core.Config) error {
 	return nil
 }
 
-
 func (web *Web) wwwGokissAbout() func(w http.ResponseWriter, r *http.Request) {
-	wh, err := web.newWebHandler(); if err != nil {
+	wh, err := web.newWebHandler()
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -89,22 +88,20 @@ func (web *Web) wwwGokissAbout() func(w http.ResponseWriter, r *http.Request) {
 		wh.newRequest()
 		s := wh.getSession(web, r)
 		defer wh.output(web, w, r, s)
-				
-		if(wh.canShowPage(web, s)) {
+
+		if wh.canShowPage(web, s) {
 			wh.renderTemplate(pongo2.Context{
 				"webfolder": web.webFolder,
 				"title":     "About",
-				"auth": wh.hasAuth(web, s),
+				"auth":      wh.hasAuth(web, s),
 			})
 		}
 	}
 }
 
-
-
-
 func (web *Web) wwwGokissAuthLogin(config *core.Config) func(w http.ResponseWriter, r *http.Request) {
-	wh, err := web.newWebHandler(); if err != nil {
+	wh, err := web.newWebHandler()
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -115,20 +112,20 @@ func (web *Web) wwwGokissAuthLogin(config *core.Config) func(w http.ResponseWrit
 		wh.newRequest()
 		s := wh.getSession(web, r)
 		defer wh.output(web, w, r, s)
-				
-		if(wh.canShowPage(web, s)) {
+
+		if wh.canShowPage(web, s) {
 			wh.renderTemplate(pongo2.Context{
 				"webfolder": web.webFolder,
 				"title":     "Log In",
-				"auth": wh.hasAuth(web, s),
+				"auth":      wh.hasAuth(web, s),
 			})
 		}
 	}
 }
 
-
 func (web *Web) wwwPostGokissAuthLogin(config *core.Config) func(w http.ResponseWriter, r *http.Request) {
-	wh, err := web.newWebHandler(); if err != nil {
+	wh, err := web.newWebHandler()
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -138,35 +135,34 @@ func (web *Web) wwwPostGokissAuthLogin(config *core.Config) func(w http.Response
 		wh.newRequest()
 		s := wh.getSession(web, r)
 		defer wh.output(web, w, r, s)
-		
+
 		username := r.FormValue("username")
 		password := r.FormValue("password")
 
 		authorised := false
 		for _, user := range config.Interfaces.Web.Users {
-			if(username == user.Username) {
-				if(password == user.Password) {
+			if username == user.Username {
+				if password == user.Password {
 					authorised = true
 				}
-				
+
 				break
 			}
 		}
-		
-		if(!authorised) {
+
+		if !authorised {
 			wh.setRedirect(web.webFolder + "/auth/log-in")
 			return
 		}
-		
+
 		s.Values[`auth`] = true
 		wh.setRedirect(web.webFolder + "/")
 	}
 }
 
-
-
 func (web *Web) wwwGokissAuthLogout(config *core.Config) func(w http.ResponseWriter, r *http.Request) {
-	wh, err := web.newWebHandler(); if err != nil {
+	wh, err := web.newWebHandler()
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -180,10 +176,9 @@ func (web *Web) wwwGokissAuthLogout(config *core.Config) func(w http.ResponseWri
 	}
 }
 
-
-
 func (web *Web) wwwGokiss(config *core.Config) func(w http.ResponseWriter, r *http.Request) {
-	wh, err := web.newWebHandler(); if err != nil {
+	wh, err := web.newWebHandler()
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -194,22 +189,21 @@ func (web *Web) wwwGokiss(config *core.Config) func(w http.ResponseWriter, r *ht
 		wh.newRequest()
 		s := wh.getSession(web, r)
 		defer wh.output(web, w, r, s)
-				
-		if(wh.canShowPage(web, s)) {
+
+		if wh.canShowPage(web, s) {
 			wh.renderTemplate(pongo2.Context{
 				"webfolder":    web.webFolder,
 				"title":        "Overview",
 				"servergroups": config.ServerGroups,
-				"auth": wh.hasAuth(web, s),
+				"auth":         wh.hasAuth(web, s),
 			})
 		}
 	}
 }
 
-
-
 func (web *Web) wwwGokissServergroups(config *core.Config) func(w http.ResponseWriter, r *http.Request) {
-	wh, err := web.newWebHandler(); if err != nil {
+	wh, err := web.newWebHandler()
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -220,21 +214,21 @@ func (web *Web) wwwGokissServergroups(config *core.Config) func(w http.ResponseW
 		wh.newRequest()
 		s := wh.getSession(web, r)
 		defer wh.output(web, w, r, s)
-				
-		if(wh.canShowPage(web, s)) {
+
+		if wh.canShowPage(web, s) {
 			wh.renderTemplate(pongo2.Context{
-				"webfolder": web.webFolder,
+				"webfolder":    web.webFolder,
 				"title":        "Overview",
 				"servergroups": config.ServerGroups,
-				"auth": wh.hasAuth(web, s),
+				"auth":         wh.hasAuth(web, s),
 			})
 		}
 	}
 }
 
-
 func (web *Web) wwwGokissServergroup(config *core.Config) func(w http.ResponseWriter, r *http.Request) {
-	wh, err := web.newWebHandler(); if err != nil {
+	wh, err := web.newWebHandler()
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -245,8 +239,8 @@ func (web *Web) wwwGokissServergroup(config *core.Config) func(w http.ResponseWr
 		wh.newRequest()
 		s := wh.getSession(web, r)
 		defer wh.output(web, w, r, s)
-				
-		if(wh.canShowPage(web, s)) {
+
+		if wh.canShowPage(web, s) {
 			params := r.URL.Query()
 			servergroupName := params.Get(":servergroupName")
 
@@ -262,15 +256,15 @@ func (web *Web) wwwGokissServergroup(config *core.Config) func(w http.ResponseWr
 				"servergroupName": servergroupName,
 				"servergroup":     servergroup,
 				"tasks":           config.Tasks,
-				"auth": wh.hasAuth(web, s),
+				"auth":            wh.hasAuth(web, s),
 			})
 		}
 	}
 }
 
-
 func (web *Web) wwwGokissTasks(config *core.Config) func(w http.ResponseWriter, r *http.Request) {
-	wh, err := web.newWebHandler(); if err != nil {
+	wh, err := web.newWebHandler()
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -281,22 +275,21 @@ func (web *Web) wwwGokissTasks(config *core.Config) func(w http.ResponseWriter, 
 		wh.newRequest()
 		s := wh.getSession(web, r)
 		defer wh.output(web, w, r, s)
-				
-		if(wh.canShowPage(web, s)) {
+
+		if wh.canShowPage(web, s) {
 			wh.renderTemplate(pongo2.Context{
 				"webfolder": web.webFolder,
 				"title":     "Tasks",
 				"tasks":     config.Tasks,
-				"auth": wh.hasAuth(web, s),
+				"auth":      wh.hasAuth(web, s),
 			})
 		}
 	}
 }
 
-
-
 func (web *Web) wwwGokissTaskRun(config *core.Config) func(w http.ResponseWriter, r *http.Request) {
-	wh, err := web.newWebHandler(); if err != nil {
+	wh, err := web.newWebHandler()
+	if err != nil {
 		log.Fatal(err)
 	}
 
@@ -307,7 +300,7 @@ func (web *Web) wwwGokissTaskRun(config *core.Config) func(w http.ResponseWriter
 		wh.newRequest()
 		s := wh.getSession(web, r)
 		defer wh.output(web, w, r, s)
-				
+
 		params := r.URL.Query()
 		servergroupName := params.Get(":servergroupName")
 		taskName := params.Get(":taskName")
@@ -324,33 +317,32 @@ func (web *Web) wwwGokissTaskRun(config *core.Config) func(w http.ResponseWriter
 			return
 		}
 
-		if(wh.canShowPage(web, s)) {
+		if wh.canShowPage(web, s) {
 			wh.renderTemplate(pongo2.Context{
-				"host":      r.Host,
-				"webfolder": web.webFolder,
-				"title":     "Run Task",
-				"servergroupName":  servergroupName,
-				"taskName":  taskName,
-				"auth": wh.hasAuth(web, s),
+				"host":            r.Host,
+				"webfolder":       web.webFolder,
+				"title":           "Run Task",
+				"servergroupName": servergroupName,
+				"taskName":        taskName,
+				"auth":            wh.hasAuth(web, s),
 			})
 		}
 	}
 }
 
-
-
 // # Websocket...
 
 func (web *Web) sockGokissTaskRun(config *core.Config) func(ws *websocket.Conn) {
 	return func(ws *websocket.Conn) {
-		wh, err := web.newWebHandler(); if err != nil {
+		wh, err := web.newWebHandler()
+		if err != nil {
 			log.Fatal(err)
 		}
 
 		wh.newRequest()
 		s := wh.getSession(web, ws.Request())
 
-		if(!wh.hasAuth(web, s)) {
+		if !wh.hasAuth(web, s) {
 			// #TODO: Respond with appropriate HTTP code
 			return
 		}
@@ -371,67 +363,46 @@ func (web *Web) sockGokissTaskRun(config *core.Config) func(ws *websocket.Conn) 
 			}
 
 			switch request.Action {
-				case `task-run`:
-					// request.Args["servergroupName"]
-					web.taskRun(ws, request.Args["taskName"], config)
+			case `task-run`:
+				log.Println(request.Args)
+				group := request.Args["servergroupName"]
+				hosts, err := config.GetServerGroup(group)
+				if err != nil {
+					log.Println(err)
+					return
+				}
+
+				web.taskRun(ws, request.Args["taskName"], hosts, config)
 			}
 		}
 	}
 }
 
-
-func (web *Web) taskRun(w io.Writer, taskName string, config *core.Config) {
-	runner, err := core.NewLocalRunner()
-	if err != nil {
-		io.WriteString(w, "Error!")
-		return
-	}
-
-	go func() {
-		for {
-			select {
-			case out := <-runner.ChStdOut:
-				outString := fmt.Sprintf("%s", out)
-				log.Print("OUT: " + outString)
-
-				// #TODO: Handle error...
-				web.sendResponseToSocket(w, WsResponse{
-					Type: "out",
-					Data: map[string]string{
-						"message": outString,
-					},
-				})
-
-			case out := <-runner.ChStdErr:
-				outString := fmt.Sprintf("%s", out)
-				log.Print("ERR: " + outString)
-
-				// #TODO: Handle error...
-				web.sendResponseToSocket(w, WsResponse{
-					Type: "err",
-					Data: map[string]string{
-						"message": outString,
-					},
-				})
-			}
+func (web *Web) taskRun(w io.Writer, taskName string, hosts []core.ConfigServer, config *core.Config) {
+	for _, host := range hosts {
+		runner, err := core.GetRunner(host)
+		if err != nil {
+			io.WriteString(w, "Error!")
+			return
 		}
-	}()
+		go logOutput(web, w, runner)
 
-	err = core.RunTask(runner, config, taskName)
-	if err != nil {
-		outString := fmt.Sprintf("%s", err)
-		io.WriteString(w, outString)
+		err = core.RunTask(runner, config, taskName)
+		if err != nil {
+			outString := fmt.Sprintf("%s", err)
+			io.WriteString(w, outString)
 
-		// #TODO: Handle error...
-		web.sendResponseToSocket(w, WsResponse{
-			Type: "err",
-			Data: map[string]string{
-				"message": outString,
-			},
-		})
+			// #TODO: Handle error...
+			web.sendResponseToSocket(w, WsResponse{
+				Type: "err",
+				Data: map[string]string{
+					"message": outString,
+				},
+			})
+		}
+
+		io.WriteString(w, "Complete!")
 	}
-
-	io.WriteString(w, "Complete!")
 }
 
 func (web *Web) sendResponseToSocket(w io.Writer, r WsResponse) error {
@@ -452,29 +423,24 @@ func maxAgeHandler(seconds int, h http.Handler) http.HandlerFunc {
 	})
 }
 
-
 func (web *Web) errorHandler(w http.ResponseWriter, status int) {
 	http.Error(w, http.StatusText(status), status)
 }
 
-
-
 type WebHandler struct {
-	checkAuth     bool
-	template      *pongo2.Template
-	body          string
-	redirectUrl   string
+	checkAuth   bool
+	template    *pongo2.Template
+	body        string
+	redirectUrl string
 }
-
 
 func (web *Web) newWebHandler() (*WebHandler, error) {
 	wh := WebHandler{
 		checkAuth: false,
 	}
-	
+
 	return &wh, nil
 }
-
 
 // #TODO - this is a sledgehammer for a bug - the webhandler should ideally be refactored into persistent handler and request handler
 func (wh *WebHandler) newRequest() {
@@ -482,64 +448,89 @@ func (wh *WebHandler) newRequest() {
 	wh.redirectUrl = ""
 }
 
-
 func (wh *WebHandler) setCheckAuth(checkAuth bool) {
 	wh.checkAuth = checkAuth
 }
-
 
 func (wh *WebHandler) setRedirect(redirectUrl string) {
 	wh.redirectUrl = redirectUrl
 }
 
-
 func (wh *WebHandler) setupTemplate(web *Web, template string) {
 	var err error
-	wh.template, err = web.tplSet.FromCache(template); if err != nil {
+	wh.template, err = web.tplSet.FromCache(template)
+	if err != nil {
 		log.Fatal(err)
 	}
 }
-
 
 func (wh *WebHandler) getSession(web *Web, r *http.Request) *sessions.Session {
 	session, _ := web.sessionStore.Get(r, "gokiss")
 	return session
 }
 
-
 func (wh *WebHandler) hasAuth(web *Web, s *sessions.Session) bool {
-	auth, ok := s.Values[`auth`]; if !ok || auth != true {
+	auth, ok := s.Values[`auth`]
+	if !ok || auth != true {
 		return false
 	}
-	
+
 	return true
 }
 
-
 func (wh *WebHandler) canShowPage(web *Web, s *sessions.Session) bool {
-	if(wh.checkAuth && !wh.hasAuth(web, s)) {
+	if wh.checkAuth && !wh.hasAuth(web, s) {
 		wh.setRedirect(web.webFolder + "/auth/log-in")
 		return false
 	}
-	
+
 	return true
 }
 
-
 func (wh *WebHandler) renderTemplate(context pongo2.Context) {
 	var err error
-	wh.body, err = wh.template.Execute(context); if err != nil {
+	wh.body, err = wh.template.Execute(context)
+	if err != nil {
 		//wh.errorHandler(w, http.StatusInternalServerError)
 	}
 }
 
-
 func (wh *WebHandler) output(web *Web, w http.ResponseWriter, r *http.Request, s *sessions.Session) {
 	s.Save(r, w)
-	
-	if(wh.redirectUrl != "") {
+
+	if wh.redirectUrl != "" {
 		http.Redirect(w, r, wh.redirectUrl, http.StatusFound)
-	} else {	
+	} else {
 		io.WriteString(w, wh.body)
+	}
+}
+
+func logOutput(web *Web, w io.Writer, runner core.Runner) {
+	for {
+		select {
+		case out := <-runner.ChStdOut():
+			outString := fmt.Sprintf("%s", out)
+			log.Print("OUT: " + outString)
+
+			// #TODO: Handle error...
+			web.sendResponseToSocket(w, WsResponse{
+				Type: "out",
+				Data: map[string]string{
+					"message": outString,
+				},
+			})
+
+		case out := <-runner.ChStdErr():
+			outString := fmt.Sprintf("%s", out)
+			log.Print("ERR: " + outString)
+
+			// #TODO: Handle error...
+			web.sendResponseToSocket(w, WsResponse{
+				Type: "err",
+				Data: map[string]string{
+					"message": outString,
+				},
+			})
+		}
 	}
 }

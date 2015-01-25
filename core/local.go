@@ -11,14 +11,14 @@ import (
 const READ_BUFFER_SIZE = 1024
 
 type Local struct {
-	ChStdOut chan []byte
-	ChStdErr chan []byte
+	chStdOut chan []byte
+	chStdErr chan []byte
 }
 
 func NewLocalRunner() (*Local, error) {
 	lr := Local{
-		ChStdOut: make(chan []byte),
-		ChStdErr: make(chan []byte),
+		chStdOut: make(chan []byte),
+		chStdErr: make(chan []byte),
 	}
 
 	return &lr, nil
@@ -62,7 +62,7 @@ func (l *Local) Run(task Task) error {
 			}
 
 			if outBytes > 0 {
-				l.ChStdOut <- bufferStdOut[:outBytes]
+				l.ChStdOut() <- bufferStdOut[:outBytes]
 			}
 		}
 
@@ -77,7 +77,7 @@ func (l *Local) Run(task Task) error {
 			}
 
 			if errBytes > 0 {
-				l.ChStdErr <- bufferStdErr[:errBytes]
+				l.ChStdErr() <- bufferStdErr[:errBytes]
 			}
 		}
 
@@ -97,10 +97,18 @@ func (l *Local) Close() {
 func LogOutput(runner *Local) {
 	for {
 		select {
-		case out := <-runner.ChStdOut:
+		case out := <-runner.chStdOut:
 			log.Printf("%s", out)
-		case out := <-runner.ChStdErr:
+		case out := <-runner.chStdErr:
 			log.Printf("%s", out)
 		}
 	}
+}
+
+func (l *Local) ChStdOut() chan []byte {
+	return l.chStdOut
+}
+
+func (l *Local) ChStdErr() chan []byte {
+	return l.chStdOut
 }

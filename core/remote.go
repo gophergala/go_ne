@@ -17,7 +17,9 @@ import (
 // Remote describes a runner which runs task
 // on a remote system via SSH.
 type Remote struct {
-	Client *ssh.Client
+	chStdOut chan []byte
+	chStdErr chan []byte
+	Client   *ssh.Client
 }
 
 // NewRemoteRunner creates a new runner which runs
@@ -116,4 +118,12 @@ func loadKey(file string) (interface{}, error) {
 	}
 
 	return key, nil
+}
+
+func (r *Remote) ChStdOut() chan []byte {
+	return r.chStdOut
+}
+
+func (r *Remote) ChStdErr() chan []byte {
+	return r.chStdOut
 }
