@@ -31,6 +31,7 @@ func NewCommand() *Command {
 
 func updateCommand() shared.Command {
 	cmd := []string{
+		"sudo",
 		"apt-get",
 		"update",
 		"-y",
@@ -43,6 +44,7 @@ func installCommand(args shared.Args) shared.Command {
 	packages := shared.ExtractOptions(args.Options["packages"])
 
 	cmd := []string{
+		"sudo",
 		"apt-get",
 		"install",
 		"-y",

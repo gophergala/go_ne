@@ -1,11 +1,11 @@
-# go_ne
+# go_ne (codename kiss)
 
 ## Description
 
-go_ne is an automation tool which allows you to execute arbitrary tasks. It is intended
+kiss is an automation tool which allows you to execute arbitrary tasks. It is intended
 to make deployment easier.
 
-go_ne can be used in two different ways:
+kiss can be used in two different ways:
 * Remote execution of scripts via SSH
 * Execution of scripts via the web interface
 
@@ -20,19 +20,19 @@ Describe how to deploy via the web interface...
 Download the binary from GitHub:
 
 ```
-$ go get github.com/gophergala/go_ne/cli
+$ go get github.com/gophergala/go_ne/kiss
 ```
 
 You can start your deployment by running one of the following commands:
 
 * Authentication via username/password
 ```
-$ cli -host=name-or-ip -username=username -password=secret -task=deploy
+$ kiss -host=name-or-ip -username=username -password=secret -task=deploy
 ```
 
 * Authentication via private/public key:
 ```
-$ cli -host=name-or-ip -key=/Users/your-user-name/.ssh/id_rsa -task=deploy
+$ kiss -host=name-or-ip -key=/Users/your-user-name/.ssh/id_rsa -task=deploy
 ```
 
 The commands above assume you have placed a `.kiss.yml` file in the root of your project. Here is an example
@@ -76,12 +76,14 @@ tasks:
       - command: supervisorctl stop example-app
 ```
 
+TIP: You can use our test application to test the steps above: https://github.com/Tobscher/go-example-app
+
 ### Options
 
 #### -host
 
 ```
-$ cli -host=www.example.org -task=deploy
+$ kiss -host=www.example.org -task=deploy
 ```
 
 Defines the remote host to connect to via SSH.
@@ -89,7 +91,7 @@ Defines the remote host to connect to via SSH.
 #### -port
 
 ```
-$ cli -port=23
+$ kiss -port=23
 ```
 
 Defines the port which is used to connect via SSH. Default: 22
@@ -97,7 +99,7 @@ Defines the port which is used to connect via SSH. Default: 22
 #### -username
 
 ```
-$ cli -username=deployer -task=deploy
+$ kiss -username=deployer -task=deploy
 ```
 
 Defines the username to use to connect via SSH.
@@ -105,7 +107,7 @@ Defines the username to use to connect via SSH.
 #### -password
 
 ```
-$ cli -password=secret
+$ kiss -password=secret
 ```
 
 Defines the password to be used to connect via SSH.
@@ -113,7 +115,7 @@ Defines the password to be used to connect via SSH.
 #### -key
 
 ```
-$ cli -key=$HOME/.ssh/id_rsa
+$ kiss -key=$HOME/.ssh/id_rsa
 ```
 
 Defines the key file to be used to connect via SSH.
@@ -159,6 +161,12 @@ func main() {
 ```
 
 The example above defines a plugin which runs the `env` command on your server.
+
+## Limitations
+
+* Plugins will get a port assigned starting from 8000
+* Plugins need to be prefixed wit plugin-, e.g. plugin-apt-get
+* Some tasks require sudo
 
 ## Contributing
 
