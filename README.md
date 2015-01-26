@@ -143,7 +143,7 @@ Defines the config file which includes the task definition. Default .kiss.yml
 
 ## The Web Interface
 
-![alt tag](https://raw.github.com/gophergala/go_ne/githubdocs/gokiss-web.jpg)
+![The Web Interface](https://raw.githubusercontent.com/gophergala/go_ne/master/githubdocs/gokiss-web.jpg)
 
 [Note: the web interface is currently less complete than the CLI and has some messaging issues]
 
@@ -328,11 +328,16 @@ Please refer to the [plugins directory](https://github.com/gophergala/go_ne/tree
 
 ## Contributing
 
+We hope you find this project useful. Please help us build upon it!
+
 1. Fork it ( https://github.com/gophergala/go_ne/fork )
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create a new Pull Request
+
+
+![Goofy Gopher](https://raw.githubusercontent.com/gophergala/go_ne/master/githubdocs/gopher.jpg)
 
 ## License
 
