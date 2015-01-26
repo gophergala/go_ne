@@ -328,6 +328,8 @@ Please refer to the [plugins directory](https://github.com/gophergala/go_ne/tree
 * Some tasks require sudo
 * Daemon has problems running remote tasks [partly patched in a branch]
 * The Web interface should run under SSL
+* The configuration file could take a variable block
+* Results from tasks could be assigned to variables and feed into other tasks, or branch the flow (so periodic server monitoring => alert emails could then be possible)
 
 ## Contributing
 
