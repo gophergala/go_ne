@@ -113,6 +113,8 @@ tasks:
       - command: supervisorctl stop example-app
 ```
 
+(If the server is to operate locally, use `run_locally: true` instead of ssh username/password/key_path).  
+
 TIP: You can use our test application to test the steps above: https://github.com/Tobscher/go-example-app
 
 ### Options
