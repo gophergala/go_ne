@@ -11,9 +11,10 @@ We wanted to meet somewhere in the middle to create an easily set up, easy to us
 
 Kiss is a plugin-based automation tool which allows you to execute arbitrary tasks on a remote machine (or even locally). It is intended to make deployments easier.
 
-You can interact with Kiss in two different ways:
+You can interact with Kiss in three different ways:
 * Via a Command Line Interface  
 * Via a web interface  
+* Using webhooks or periodic triggers  
 
 It is able to:
 * Remotely execute scripts via SSH
