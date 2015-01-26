@@ -1,31 +1,41 @@
-# go_ne (codename kiss)
+# GoKiss (by team go_ne)
 
-## Description
+## Inspiration
 
-kiss is a plugin-based automation tool which allows you to execute arbitrary tasks on a remote machine (or even locally). It is intended to make deployments easier.
+James runs a few hobby projects on a VM.  
+Tobias helps manage large-scale infrastructure for a multinational company.   
 
-kiss can be used in two different ways:
-* Remote execution of scripts via SSH
-* Execution of scripts via the web interface
+We wanted to meet somewhere in the middle to create an easily set up, easy to use, highly configurable tool to help manage our infrastructures - small and large scale.  
 
-The execution of your tasks is driven by a YAML file which can be placed in your projects root folder (`.kiss.yml`). Each task consists of an infinite number of steps. Tasks can be executed against a list of server groups (e.g. run task `mysqldump` against all servers in group `db`).
+## Overview
+
+Kiss is a plugin-based automation tool which allows you to execute arbitrary tasks on a remote machine (or even locally). It is intended to make deployments easier.
+
+You can interact with Kiss in two different ways:
+* Via a Command Line Interface  
+* Via a web interface  
+
+It is able to:
+* Remotely execute scripts via SSH
+* Locally execute scripts
+(tested on Ubuntu Linux)
+
+The execution of your tasks is driven by a YAML file. Each task consists of a number of steps. Tasks can be executed against a list of server groups (e.g. run task `mysqldump` against all servers in group `db`).
 
 Having your deployment scripts in a local place gives you and your team a number of benefits:
 * Team members don't have to remember how certain tasks have to be executed
 * You can easily add additional tasks by modifying a single configuration file
 * The configuration can be in version control (tasks don't get lost)
 
-The plugin-based architecture allows you to define more complex deployment tasks.
+The plugin-based architecture allows you to control more complex deployment tasks.
 
 This project has been developed during [Gopher Gala 2015](http://gophergala.com/).
 
-## Deploy via the web interface
-
-Describe how to deploy via the web interface...
-
-## Deploy to a remote system
+## The CLI
 
 ![Preview](https://i.imgflip.com/gt47e.gif "kiss preview")
+
+For the CLI, the YAML file can be placed in your project's root folder (`.kiss.yml`).
 
 Follow the example on [Tobscher/go-example-app](https://github.com/Tobscher/go-example-app#test-deployment-via-kiss) or do it manually:
 
@@ -131,9 +141,142 @@ $ kiss -config=.kiss-staging.yml
 
 Defines the config file which includes the task definition. Default .kiss.yml
 
+## The Web Interface
+
+![alt tag](https://raw.github.com/gophergala/go_ne/githubdocs/gokiss-web.jpg)
+
+[Note: the web interface is currently less complete than the CLI and has some messaging issues]
+
+To start the daemon/web interface, build and run it:
+
+```
+$ cd go_ne/daemon/
+```
+
+```
+$ go build -o daemon.exe
+```
+
+```
+$ daemon.exe
+```
+
+The configuration file is the same format as for the CLI, but since it's running as a web facing daemon, we can set up triggers (currently GitHub Webhooks and periodic jobs are supported).
+
+
+## Configuration
+
+An example configuration looks like this:
+
+```yaml
+servergroups:
+  web:
+    - host: localhost
+      username: "vagrant"
+      password: "vagrant"
+      port: 2222
+    - host: www.example.org
+      username: "root"
+      key_path: "/path/to/private_key"
+  db:
+    - host: localhost
+      username: "vagrant"
+      password: "vagrant"
+      port: 2222
+    - host: db1.example.org
+      username: "db"
+      key_path: "/path/to/private_key"
+    - host: db2.example.org
+      username: "db"
+      key_path: "/path/to/private_key"
+
+tasks:
+  setup:
+    steps:
+      - plugin: apt-get
+        options:
+          update: true
+          packages:
+            - "git"
+            - "golang"
+            - "python-setuptools"
+      - command: go version
+      - command: easy_install supervisor
+      - command: rm -rf example-app
+      - plugin: git-clone
+        options:
+          repo: "https://github.com/your-fork/go-example-app.git"
+          directory: "example-app"
+      - command: cp example-app/supervisord.conf /etc/supervisord.conf
+      - command: supervisord || echo "Looks like supervisord is already running"
+  deploy:
+    steps:
+      - plugin: whoami
+      - plugin: env
+      - command: supervisorctl stop example-app
+      - command: cd example-app && git pull
+      - command: cd example-app && go test -v
+      - command: cd example-app && go build -v
+      - command: supervisorctl start example-app
+      - command: curl http://your.server.org:8080/
+  start:
+    steps:
+      - command: supervisorctl start example-app
+  stop:
+    steps:
+      - command: supervisorctl stop example-app
+```
+
+### Additional Daemon Configuration 
+
+The daemon also supports a 'triggers' block.
+
+The following responds to the GitHub webhook on `/gokiss/triggers/gitpush` by running the `deploy` task on the `web` servergroup.
+
+It also runs a periodic job `every day` (86400 seconds), running the `mysqldump` task on the `db` servergroup.
+
+```yaml
+triggers:
+  githubrepopush:
+    type: github-webhook
+    endpoint: gitpush
+    secret: mygithubsecrethere
+    servergroup: web
+    task: deploy
+  monitor:
+    type: periodic
+    period: 86400
+    servergroup: db
+    task: mysqldump
+```
+
+The web setup is configurable. This serves from `domain:port/gokiss/` and configures one user, `gokiss` with password `default`.
+
+```yaml
+interfaces:
+  web:
+    settings:
+      folder: /gokiss
+      port: 20000
+      sessionsecret: e53cr3t5h3re
+    users:
+      - username: gokiss
+        password: default
+```
+
+### Options
+
+#### -config
+
+You can also specify the location of the config file for the daemon (default is /config/test-tasks.yaml):
+
+```
+$ daemon.exe -config=.kiss.yml
+```
+
 ## Plugins
 
-### How it works
+### How plugins work
 
 We make use of a communication concept called [RPC](http://en.wikipedia.org/wiki/Remote_procedure_call). RPC allows
 us to communicate with plugins in an elegant way.
@@ -180,6 +323,8 @@ Please refer to the [plugins directory](https://github.com/gophergala/go_ne/tree
 * Plugins will get a port assigned starting from 8000
 * Plugins need to be prefixed wit plugin-, e.g. plugin-apt-get
 * Some tasks require sudo
+* Daemon has problems running remote tasks [partly patched in a branch]
+* The Web interface should run under SSL
 
 ## Contributing
 
@@ -191,4 +336,4 @@ Please refer to the [plugins directory](https://github.com/gophergala/go_ne/tree
 
 ## License
 
-MIT License. Copyright 2015 James Rutherford & Tobias Haar.
+MIT License. Copyright 2015 [James Rutherford](https://twitter.com/jtruk "Twitter - JTRUK") & [Tobias Haar](https://twitter.com/tobscher "Twitter - Tobscher").
